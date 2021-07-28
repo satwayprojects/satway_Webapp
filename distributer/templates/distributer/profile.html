@@ -1,0 +1,125 @@
+{% extends 'distributer/base.html' %}
+
+{% block maincontent %}
+<style>
+    .profile_field:disabled {
+        background-color: #0E1726;
+        border-style: solid;
+        border-color: #36415A;
+        color: #fff;
+    }
+</style>
+<div class="container-fluid " style=" margin-top:90px;">
+
+    <div class="profile_main_div">
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-6">
+                <div class="jumbotron profile_detail-div">
+                    <center>
+                        <h5 style="color:#fff; margin-top: -30px;">Profile Details</h5>
+                    </center><br>
+                    <form action="{% url 'distributer:editprofile'%}" method="POST" autocomplete="off">
+                        {% csrf_token %}
+                        <div class="form-group row">
+                            <label for="username" class="col-sm-3 col-form-label">User Name</label>
+                            <div class="col-sm-9">
+                                <input type="text" value="{{data.username}}" name="username"class="form-control profile_field"
+                                    id="username" disabled>
+                                
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="email" class="col-sm-3 col-form-label">Email</label>
+                            <div class="col-sm-9 input-group">
+                                <input type="email" value="{{data.email}}" class="form-control border-right-0 profile_field" id="email" name="email"
+                                    disabled>
+                                    <span class="input-group-append ">
+                                        <button class="btn" style="border-style: 1px;border-color: #36415A;color: #fff;"type="button"onclick="btn_email()"><i class="iconify" data-icon="bx:bx-edit" data-inline="false"></i></button>
+                                    </span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="phone" class="col-sm-3 col-form-label">Phone</label>
+                            <div class="col-sm-9 input-group">
+                                <input type="text" value="{{data.phone}}" class="form-control border-right-0 profile_field" name="phone" id="phone" maxlength="10"disabled>
+                                <span class="input-group-append ">
+                                    <button class="btn" style="border-style: 1px;border-color: #36415A;color: #fff;"type="button"onclick="btn_phone()"><i class="iconify" data-icon="bx:bx-edit" data-inline="false"></i></button>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group row ">
+                            <label for="company_details" class="col-sm-3 col-form-label">Address</label>
+                            <div class="col-sm-9 input-group">
+                                <textarea class="form-control profile_field" rows="4" name="company_details"
+                                    id="company_details"disabled>{{data.company_details}}</textarea>
+                                    <span class="input-group-append ">
+                                        <button class="btn" style="border-style: 1px;border-color: #36415A;color: #fff;"type="button"onclick="btn_company()"><i class="iconify" data-icon="bx:bx-edit" data-inline="false"></i></button>
+                                    </span>
+                            </div>
+                        </div>
+                        <div class="form-group row ">
+                        <div class="col-sm-3"></div>
+                        <div class="col-sm-9">
+                        <center><input type="submit" class="btn btn-success " style="width:30%;" value="Save Profile">
+                        </center></div>
+                    </div>
+
+                    </form>
+
+
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-4 col-xs-4">
+                <div>
+                    <form action="{% url 'distributer:profile'%}" method="POST" autocomplete="off">
+                        {% csrf_token %}
+
+                        <div class="jumbotron profile_password-div">
+                            <center>
+                                <h5 style="color:#fff;">Change Password</h5>
+                            </center><br>
+                            
+                            <div class="form-group">
+                                <label for="new_password">New Password</label>
+                                <input type="password" class="form-control password_field" name="new_password" id="new_password" minlength="4">
+                                
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm_password">Confirm Password</label>
+                                <input type="text" class="form-control password_field" name="confirm_password" id="confirm_password"minlength="4">
+                            </div>
+                            <center><input type="submit" class="btn btn-success " style="width:30%;" value="Save">
+                            </center>
+
+
+                        </div>
+                    </form>
+
+                </div>
+                {% if error_message %}
+                <h4 class=""><center style="color:red">{{ error_message }}</center></h4>
+            {% endif %}
+                {% if success_message %}
+                <h4 class=""><center style="color:green">{{ success_message }}</center></h4>
+            {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+<script>
+    function btn_email(){
+        document.getElementById('email').removeAttribute('disabled')
+    }
+    function btn_phone(){
+        document.getElementById('phone').removeAttribute('disabled')
+    }
+    function btn_company(){
+        document.getElementById('company_details').removeAttribute('disabled')
+    }
+
+</script>
+
+{% endblock %}

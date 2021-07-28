@@ -1,0 +1,135 @@
+{% extends 'subuser/base.html' %}
+{% block maincontent %}
+{%load static%}
+<div class="container-fluid card_main">
+  <div class="card_nav_width"></div>
+  <nav class="navbar navbar-expand-lg card_navbar ">
+    <div class=" align-self-center mx-auto">
+      <button type="button" class="btn  btn-outline-secondary text-white card_button"><i
+          class='fa fa-question-circle-o'></i> Status</button>
+      <button type="button" class="btn  btn-outline-secondary text-white card_button"><i
+          class='fa fa-location-arrow'></i> Locate</button>
+      <button type="button" class="btn  btn-outline-secondary text-white card_button"><i
+          class="fa fa-road card_icon"></i>Road</button>
+      <button type="button" class="btn  btn-outline-secondary text-white card_button"><i class='fa fa-history'></i>
+        History</button>
+      <button type="button" class="btn  btn-outline-secondary text-white card_button"><i class='fa fa-bookmark-o'></i>
+        Record</button>
+      <form style = "float: right;" action="{% url 'user:Vehicles' %}" method="POST">
+        {% csrf_token %}
+        <input type="text" id="vehicle_no" name = "vehicle_no" style="width: auto;" name="quantity" placeholder="Enter Vehicle No">
+        <input type="submit" class="submit-button" style="width: 130px;" id="btn" value="Search">
+      </form>
+    </div>
+  </nav>
+  <div class="row card_main">
+    {% for vehicle_no, latitude,longitude,timestamp,speed,vehicle_mode,address,imei in context %}
+    <div class="col-md-4 col-sm-4 col-xs-4" style="margin-bottom: 20px;">
+      <div class="jumbotron card_box">
+        <div class="row vehicle_no">
+          <div class="col-md-4 col-sm-6 col-xs-6">
+          </div>
+          <div class="col-md-8 col-sm-6 col-xs-6">
+            {% if vehicle_mode == "S" %}
+            <div class="vehicle_name" style="background-color: red;">
+              {% elif vehicle_mode == "M" %}
+              <div class="vehicle_name" style="background-color: green;">
+                {% elif vehicle_mode == "H" %}
+                <div class="vehicle_name" style="background-color: yellow;">
+                  {% endif %}
+                  <i class="fa fa-car"></i> {{vehicle_no}}
+                </div>
+              </div>
+            </div>
+            <div class="card_middle_row">
+              <div class="row d-flex align-items-center">
+                <div class="col-md-12">
+                  <div class="d-inline-block ">
+                    <img class="card_img" src="{% static 'img/car.png' %}">
+                  </div>
+                  <div class="d-inline-block " style="padding-top:4px;padding-left:6px;">
+                    <div class="car_details">
+                      <span class="speed_span">Speed : {{speed}}/</span>
+                      <span class="km_unit">Kilometer</span>
+                    </div>
+                    <div class="daily_distance">
+                      <span>Vehicle Status : </span>
+                      {% if vehicle_mode == "S" %}
+                      Stopped
+                      {% elif vehicle_mode == "M" %}
+                      Moving
+                      {% elif vehicle_mode == "H" %}
+                      Idle
+                      {% endif %}
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row base-row" style="width: auto; height: auto;">
+              <div class="col-md-12">
+
+                <span>Location : {{address}}</span>
+              </div>
+            </div>
+
+
+            <div class="row card_base d-flex align-items-center" style="padding-bottom: 0px;">
+
+              <span class='lat' style="display: none;">{{imei}}</span>
+
+              <div class=" base_block d-inline-block submit">
+                <a><span><i class='fa fa-location-arrow'></i></span></a>
+              </div>
+              <div class="base_block d-inline-block ">
+                <a><span><i class="fa fa-road base_icon"></i></span></a>
+              </div>
+              <div class="base_block d-inline-block history">
+                <a><span><i class='fa fa-history'></i></span></a>
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+
+        {% endfor %}
+        <form action="{% url 'user:load_live_view'%}" style="display: none;" method="POST" id="frm">
+          {% csrf_token %}
+          <input type="text" name="imei" id="imei">
+        </form>
+        <form action="{% url 'user:load_history'%}" style="display: none;" method="POST" id="frmhistory">
+          {% csrf_token %}
+          <input type="text" name="imei" id="imeino">
+        </form>
+      </div>
+    </div>
+    <script>
+      $(document).ready(function () {
+        $('.submit').click(function () {
+          var imei = $(this).prevAll(".lat").text();
+          document.getElementById("imei").value = imei;
+          document.getElementById('frm').submit();
+        });
+        $('.history').click(function () {
+          alert("jh")
+          var imei = $(this).prevAll(".lat").text();
+          alert(imei)
+          document.getElementById("imeino").value = imei;
+          document.getElementById('frmhistory').submit();
+        });
+      });
+      function load_address(lat, lon) {
+        alert(lat)
+      }
+
+
+      $("#vehicle_no").autocomplete({
+        source: "{% url 'subuser:ajax_vehicle_no_load' %}",
+        minLength: 2,
+    });
+    </script>
+
+    {% endblock %}

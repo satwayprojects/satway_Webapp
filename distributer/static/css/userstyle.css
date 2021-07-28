@@ -1,0 +1,75 @@
+
+
+.iconlabel{
+    margin: 5px 0px 5px 5px;
+    background-color: #acacac;
+    border-radius: 50px;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    
+}
+.icon{
+    width:20px; 
+    height:20px;
+}
+.paddingsection{
+ padding-top: 15px;
+ padding-bottom: 15px;
+}
+.count{
+    color: #ACACAC;
+    align-items: center;
+    text-align: center;
+    font-size: 100%;
+    font-weight: bold;
+    padding-left: 10%;
+}
+.matrix{
+    background-color: #232E48;
+    border: 1px solid #acacac;
+    border-radius: 5px;
+    align-items: center;
+    text-align: center;
+    display: flex;
+}
+.sidematrix{
+   
+    background-color: #232E48;
+    border: 1px solid #acacac;
+    border-radius: 5px;
+    align-items: center;
+    text-align: center;
+    display: flex;
+}
+.scrollable-content{
+    height: 200px;
+    overflow: auto;
+  
+
+}
+*::-webkit-scrollbar {
+    
+    width: 3px;
+  }
+
+  
+  *::-webkit-scrollbar-thumb {
+
+    background-color: rgb(158, 158, 167);
+    border-radius: 20px;
+    
+  }
+.description{
+    padding-left: 10%;
+    color: #ACACAC;
+    align-items: center;
+    text-align: center;
+    padding-top: 3px;
+}
+@media screen and (max-width: 900px) {
+    .row{
+      
+    }
+
+  }

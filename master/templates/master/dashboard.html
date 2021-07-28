@@ -1,0 +1,241 @@
+{% extends 'master/base.html' %}
+
+{% block maincontent %}
+
+<style>
+    .digit {
+        color: #FFFFFF;
+        font-size: 50px;
+        margin-top: -15px;
+    }
+
+    .iconify {
+        font-size: 25px;
+    }
+
+    .iconify:hover {
+        color: olivedrab;
+    }
+
+    .content {
+
+        text-align: center;
+        height: 100px;
+    }
+
+    .changepass {
+        position: fixed;
+        top: 25%;
+        left: 25%;
+        width: 100%;
+        height: 100%;
+        z-index: 99;
+    }
+    label{
+        padding-top:3px;
+    }
+</style>
+<div class="changepass" id="changepass" style="display: none; padding-top: -200px;">
+    <div class=" col-sm-8 col-md-6 paddingClass" style=" border: 5px solid rgb(240, 227, 227)">
+        <form action="" method="POST" id="addDevicefrm">
+            <div>
+                <center><label class="title">Change Password</label></center>
+            </div>
+            <div class="media-top">
+                <label>Change passwordr for : </label>
+                <label id="username"></label>
+            </div>
+            <div class="media-top">
+                <label for="newpassword">New Password</label>
+                <input class="input" type="password" name="newpassword" id="newpassword" required autocomplete="off">
+                <br><span class="error_form" id="new_password_error_message"></span>
+            </div>
+            <div class="media-top">
+                <label for="confirmpassword">Confirm Password</label>
+                <input class="input" type="password" name="confirmpassword" id="confirmpassword" required
+                    autocomplete="off">
+                <br><span class="error_form" id="confirm_password_error_message"></span>
+            </div>
+
+            <div class="button">
+
+                <input type="button" name="Change" id="sub-button" value="ADD" class="sub-button">
+                <input type="button" id="close" value="close" class="sub-button"><br>
+                <span class="error_form" id="error_message"></span>
+                <label>{{status}}</label>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="container-fluid mainContainer" id="mainContainer">
+    <div class="row">
+        <div class=" col-sm-3 col-md-3 content pl-1">
+            <div class="card-view">
+                <center><label style="width:100%;"> Total Device Count </label></center>
+                <label class="digit">{{stock}}</label>
+            </div>
+        </div>
+
+        <div class=" col-sm-3 col-md-3 content pl-1">
+            <div class="card-view">
+                <center><label> Ready to Sell </label></center>
+                <label class="digit">{{ready_to_sell}}</label>
+            </div>
+        </div>
+
+        <div class=" col-sm-3 col-md-3 content pl-1">
+            <div class="card-view">
+                <center><label> Sold Devices </label></center>
+                <label class="digit">{{sale}}</label>
+            </div>
+        </div>
+        
+        <div class=" col-sm-3 col-md-3 content pl-1">
+            <div class="card-view">
+                <center><label style="width:100%;"> Deactivated (Sold) </label></center>
+                <label class="digit">{{deactivated_in_sold}}</label>
+            </div>
+        </div>
+        
+    </div>
+
+    <div class="row section-2">
+    
+    </div>
+
+    <div class="row">
+
+        <div class=" col-sm-3 col-md-3 content pl-1">
+            <div class="card-view">
+                <center><label> Distributors </label></center>
+                <label class="digit">{{dealer}}</label>
+            </div>
+        </div>
+
+    </div>
+
+    
+   
+    <div class="row">
+        <div class=" col-sm-6 col-md-6 pl-1">
+            <div class="card-view" style="margin-top: 30px;">
+                <center>
+                    <h3 style="margin-top: 8px; color: white;"> Distributors </h3><br>
+                    <label style="width: 60px;" id="searchdevice">Search</label>
+                    <input type="text" name="searchdevice" id="searchinput" placeholder="Search Distributor">
+                </center>
+                <table class="table table-striped table-borderless table-hover tbl"
+                    style="width:100%;  margin-top: 10px; text-align: center;" id="userTable">
+                    <tr style="background-color: #232B3B;border-color: #888EA8; border-style: solid;border-width: 1px;">
+                        <th>Distributor</th>
+                        <th>Phone Number</th>
+                        <th>Reset</th>
+                    </tr>
+                    {% for data in userslist%}
+                    <tr>
+                        <td class="username">{{data.username}}</td>
+                        <td>{{data.phone}}</td>
+
+                        <td><span class="iconify" id="iconify" data-icon="codicon:key" data-inline="false"></span></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+     
+
+        var username = ""
+        $("#userTable").on('click', '.iconify', function () {
+            username = $(this).closest('tr').find('.username').text();
+            document.getElementById("changepass").style.display = "block";
+            document.getElementById("mainContainer").style.opacity = "0.1";
+            document.getElementById("username").innerHTML = username;
+        });
+
+        $("#close").on('click', function () {
+            $("#newpassword").val("")
+            $("#confirmpassword").val("")
+            document.getElementById("changepass").style.display = "none";
+            document.getElementById("mainContainer").style.opacity = "1";
+        });
+        
+        $("#sub-button").on('click', function () {
+            if ($("#newpassword").val() == $("#confirmpassword").val()) {
+                var token = '{{csrf_token}}';
+                $.ajax({
+                    headers: { "X-CSRFToken": token },
+                    url: "{% url 'master:ajax_password_reset'%}",
+                    type: 'POST',
+                    data: {
+                        'username': username, 'password': $("#newpassword").val()
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        alert("Request: " + JSON.stringify(data));
+                        $("#newpassword").val("")
+                        $("#confirmpassword").val("")
+                    },
+                    error: function (request, error) {
+                        alert("Request: " + JSON.stringify(request));
+                        $("#newpassword").val("")
+                        $("#confirmpassword").val("")
+                    }
+                });
+            }
+            else {
+                alert("error")
+            }
+        });
+
+
+        $('#searchinput').on('input', function () {
+
+            var username = $("#searchinput").val();
+            if (username.length > 3) {
+                searchuser(username)
+            }
+            else if  (username.length < 2){
+                searchuser(username)
+            }
+        });
+
+        function searchuser(username) {
+            var token = '{{csrf_token}}';
+            $.ajax({
+                headers: { "X-CSRFToken": token },
+                url: "{% url 'master:ajax_load_user'%}",
+                type: 'POST',
+                data: {
+                    'username': username
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.state == "F") {
+                    }
+                    else {
+                        $("#userTable").find("tr:not(:first)").remove();
+                        for (i = 0; i < data.imeiObject.length; i++) {
+                            $("#userTable > tbody").append("<tr><td class = username>" +
+                                data.imeiObject[i].username +
+                                "</td><td>" +
+                                data.imeiObject[i].phone +
+                                "</td><td> <span class=iconify id = iconify data-icon=codicon:key data-inline=false></span> </td></tr>");
+                        }
+                    }
+                },
+                error: function (request, error) {
+                    alert("Request: " + JSON.stringify(request));
+                }
+            });
+        }
+
+
+
+
+    </script>
+
+    {% endblock %}

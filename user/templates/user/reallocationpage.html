@@ -1,0 +1,189 @@
+{% extends 'user/base.html' %}
+{% block maincontent %}
+  <style>
+    body {
+      background-color: #060817;
+      color: #fff;
+    }
+
+    .reallocate {
+      background-color: #0E1726;
+      padding: 5% 5% 5% 5%;
+      color: #888EA8;
+
+
+    }
+
+    .reallocate_field {
+      background-color: #232E48;
+      border: 1px solid #36415A;
+      border-radius: 5px;
+      color: white;
+
+
+
+    }
+
+    .reallocate_field:focus {
+      background-color: #232E48;
+      border: 1px solid #36415A;
+      border-radius: 5px;
+      color: #fff;
+    }
+
+    .card_nav_width {
+      height: 2px;
+    }
+
+    .reallocate_navbar {
+      background-color: #0E1726;
+
+
+    }
+
+    .reallocate_button {
+      width: 200px;
+      background-color: #0E1726;
+    }
+
+    .reallocate_button:hover {
+      background-color: #3B3F5C;
+    }
+  </style>
+
+  <div class="container-fluid " style=" margin-top:90px;">
+    <div class="row">
+      <div class="col-sm-12">
+        <nav class="navbar navbar-expand-lg reallocate_navbar ">
+          <div class=" align-self-center mx-auto">
+            <button type="button" class="btn  btn-outline-secondary text-white reallocate_button"
+              onclick="delete_subuser()">Delete Sub-User</button>
+            <button type="button" class="btn  btn-outline-secondary text-white reallocate_button"
+              onclick="reallocate_vehicle()">Reallocate Vehicle</button>
+          </div>
+        </nav>
+      </div>
+    </div>
+    <div class="profile_main_div" style="margin-top:10px;">
+      <div class="row">
+
+        <div class="col-md-6 col-sm-6 col-xs-6">
+          <div class="jumbotron reallocate" id="reallocate" style="height:400px; display:none;">
+            <div class="form1" id="form1" style="display:none">
+
+              <form action="{% url 'user:DeleteSubUser' %}" method="POST">
+                {% csrf_token %}
+                <center>
+                  <h3 style="color:#fff;">Delete Sub-User </h3>
+                </center><br>
+
+                  <div class="form-group row">
+                    <label for="subuser" class="col-sm-4 col-form-label">Choose the subuser:</label>
+                    <div class="col-sm-8">
+                      <input type="text" id="subuser" name="subuser" class="form-control reallocate_field" style="width: 100%;">
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label for="phone" class="col-sm-4 col-form-label">Phone:</label>
+                    <div class="col-sm-8">
+                      <input type="phone" name="phone" class="form-control reallocate_field" id="phone">
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label for="password" class="col-sm-4 col-form-label">Your Password:</label>
+                    <div class="col-sm-8">
+                      <input type="password"  name="password" class="form-control reallocate_field" id="password">
+                    </div>
+                  </div>
+                
+                <center>
+                  <input type="submit" class="btn btn-warning" style="width:50%;" value="Delete Sub-User">
+                </center>
+                
+              </form>
+            </div>
+            <div class="form2" id="form2" style="display:none">
+              <form action="{% url 'user:reallocate_vehicle' %}" method="POST">
+                {% csrf_token %}
+                <center>
+                  <h3 style="color:#fff;">Reallocate Vehicle </h3>
+                </center><br>
+
+                <div class="form-group row">
+                  <label for="subuser" class="col-sm-4 col-form-label">Enter the Vehicle No:</label>
+                  <div class="col-sm-8">
+                    <input type="text" id="vehicle2" name="vehicle2" class="form-control reallocate_field" style="width: 100%;">
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="phone" class="col-sm-4 col-form-label">Allocated To:</label>
+                  <div class="col-sm-8">
+                    <input type="text" name="subuser2" class="form-control reallocate_field" id="subuser2" readonly style="background-color: #232E48;">
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label for="password" class="col-sm-4 col-form-label">Your Password:</label>
+                  <div class="col-sm-8">
+                    <input type="password"  name="password" class="form-control reallocate_field" id="password">
+                  </div>
+                </div>
+              
+              <center>
+                <input type="submit" class="btn btn-warning" style="width:50%;" value="Reallocate Vehicle">
+              </center>
+                
+                
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-sm-6 col-xs-6">
+          <div class="jumbotron1" id="reallocate" style="height:400px;">
+            <div class="result" id="result">
+              <h4 style="text-align: center;color: green; padding-top: 30px;"><b>{{status}}</b></h6>
+              <h4 style="text-align: center;color: red; padding-top: 30px;"><b>{{alert}}</b></h6>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function delete_subuser() {
+      document.getElementById("reallocate").style.display = "block";
+      document.getElementById("form2").style.display = "none";
+      document.getElementById("form1").style.display = "block";
+
+    }
+    function reallocate_vehicle() {
+      document.getElementById("reallocate").style.display = "block";
+      document.getElementById("form1").style.display = "none";
+      document.getElementById("form2").style.display = "block";
+
+    }
+
+
+    $("#subuser").autocomplete({
+        source: "{% url 'index:ajax_check_sub_username' %}",
+        minLength: 4,
+        select: function (event, ui) {
+            event.preventDefault();
+            var selectedArr = ui.item.value.split(",");
+            $("#subuser").val(selectedArr[0]);
+            $("#phone").val(selectedArr[1]);
+        }
+    });
+
+
+    $("#vehicle2").autocomplete({
+        source: "{% url 'user:load_vehicle_subuser' %}",
+        minLength: 2,
+        select: function (event, ui) {
+            event.preventDefault();
+            var selectedArr = ui.item.value.split(",");
+            $("#subuser2").val(selectedArr[1]);
+            $("#vehicle2").val(selectedArr[0]);
+        }
+    });
+  </script>
+{% endblock %}

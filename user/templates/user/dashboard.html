@@ -1,0 +1,841 @@
+{% extends 'user/base.html' %}
+{% block maincontent %}
+<style>
+    .input-color .color-box {
+        width: 40px;
+        height: 20px;
+        display: inline-block;
+        background-color: #ccc;
+        left: 5px;
+        top: 5px;
+    }
+
+    .color-box {
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .input-color input {
+        padding-left: 20px;
+    }
+</style>
+<div class="container-fluid" style=" margin-top:90px;">
+    <div class=" dashboard_main">
+        <div class="row">
+            <div class="col-md-9 col-sm-9 col-xs-9">
+                <div class="jumbotron dash_map" id="map">
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-3">
+                <div class="jumbotron dash_status"
+                    style="background-color:#0E1726; border-color: #888EA8; border-style: solid;border-width: 1px 0 0 0;border-radius: 5px;box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); height: max-content">
+                    <center class="vehicle_status" style="padding-bottom: 20px;">VEHICLE STATUS</center>
+                    <canvas id="myChart" style="width:100%;height:280px;"></canvas>
+                    <div class="input-color" style="text-align: center;">
+
+                        <div class="color-box" style="background-color:#680000; "><label id="stopped"></label></div>
+                        <label>Stopped</label><br>
+                        <div class="color-box" style="background-color: #FFBA00;"><label id="idle"></label></div>
+                        <label>Idle</label><br>
+                        <div class="color-box" style="background-color: #0B6322;"><label id="moving"></label></div>
+                        <label>Moving</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-6">
+                <div class="jumbotron dash_status"
+                    style="background-color:#0E1726; border-color: #888EA8; border-style: solid;border-width: 1px 0 0 0;border-radius: 5px;box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); height: max-content">
+                    <center class="vehicle_status" style="padding-bottom: 10px;">Average Speed</center>
+                    <canvas id="avgspeed" width="100%" height="50%"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-6">
+                <div class="jumbotron dash_status"
+                    style="background-color:#0E1726; border-color: #888EA8; border-style: solid;border-width: 1px 0 0 0;border-radius: 5px;box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); height: max-content">
+                    <center class="vehicle_status" style="padding-bottom: 10px;">Daily Distance</center>
+                    <canvas id="bar-chart" width="100%" height="50%"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="section-2"></div>
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-6">
+                <div class="jumbotron dash_status"
+                    style="background-color:#0E1726; border-color: #888EA8; border-style: solid;border-width: 1px 0 0 0;border-radius: 5px;box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); height: max-content">
+                    <center class="vehicle_status" style="padding-bottom: 10px;">Egine On Time</center>
+                    <canvas id="linechart" width="100%" height="50%"></canvas>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-sm-6 col-xs-6">
+                <div class="jumbotron dash_status"
+                    style="background-color:#0E1726; border-color: #888EA8; border-style: solid;border-width: 1px 0 0 0;border-radius: 5px;box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); height: max-content">
+                    <center>
+                        <h4 style="margin-top: 10px; color: white;">Sub-Users</h4><br>
+                        <label style="width: 60px;" id="searchdevice">Search</label>
+                        <input type="text" name="searchdevice" id="searchinput" placeholder="Search Sub-User">
+                    </center>
+                    <table class="table table-striped table-borderless table-hover tbl"
+                        style="width:100%;  margin-top: 5px; text-align: center;" id="userTable">
+                        <tr style="border:solid 1px; border-color:#888ea8;background-color: #232b3b;">
+                            <th>Sub-Username</th>
+                            <th>Phone No:</th>
+                            <th>Reset</th>
+                        </tr>
+                        {% for user in subuserlist%}
+                        <tr>
+                            <td class="username">{{user.username}}</td>
+                            <td>{{user.phone}}</td>
+                            <td><span class="iconify" id="iconify" data-icon="codicon:key" data-inline="false"></span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+
+
+
+        </div>
+        <!--  last 7 days running distance to be added -->
+    </div>
+</div>
+<script>
+    var flag = 0;
+    var InforObj = [];
+    var vehicle_no = {{ vehicle_no| safe }};
+    var latitude = {{ latitude| safe }};
+    var longitude = {{ longitude| safe }};
+    var time_stamp = {{ time_stamp| safe }};
+    var speed = {{ speed| safe }};
+    var vehicle_mode = {{ vehicle_mode| safe }};
+    var avg_speed = [];
+    var avg_engine = [];
+    distance_covered = [];
+    total_distance = 0;
+    var centerCords = {
+        lat: parseFloat(latitude[0]),
+        lng: parseFloat(longitude[0])
+    };
+    window.onload = function () {
+        initMap();
+    };
+
+
+    //      vehicle no at top
+    //     speed
+    // status
+    // distance
+    // last update 
+    function addMarker() {
+        for (var i = 0; i < latitude.length; i++) {
+            if (vehicle_mode[i] == "M") {
+                mode = "Running"
+            }
+            else if (vehicle_mode[i] == "S") {
+                mode = "Stopped"
+            }
+            else if (vehicle_mode[i] == "H") {
+                mode = "Idle"
+            }
+            var contentString = '<table>' +
+                '<tr><td style = "width :100px; font-size: 14px; color:#060817; font-weight : bold"> VEHICLE NO</td><td style = "width :130px; font-size: 14px; color:#060817; font-weight : bold">' + vehicle_no[i] + '</td></tr>' +
+                '<tr><td style = "color:black">SPEED</td><td style ="color:black">' + speed[i] + '</td></tr>' +
+                '<tr><td style = "color:black">STATUS</td><td style ="color:black"> ' + mode + '</td></tr>' +
+                '<tr><td style = "color:black">LAST UPDATE</td><td style ="color:black">' + time_stamp[i] + '</td></tr>' +
+                + '</table>';
+            $(".gm-style-iw").next("div").hide();
+            const marker = new google.maps.Marker({
+                position: { lat: parseFloat(latitude[i]), lng: parseFloat(longitude[i]) },
+                icon: {
+                    path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                    strokeColor: "#FFDC34",
+                    scale: 5
+                },
+
+                //  vehicle no on pointer top
+                // label: { color: 'D59563', fontWeight: 'bold', fontSize: '14px', text: vehicle_no[i] },
+                map: map
+            });
+            const infowindow = new google.maps.InfoWindow({
+                content: contentString,
+                maxWidth: 2000,
+
+            });
+            marker.addListener('click', function () {
+                closeOtherInfo();
+                infowindow.open(marker.get('map'), marker);
+                InforObj[0] = infowindow;
+            });
+            marker.addListener('mouseover', function () {
+                closeOtherInfo();
+                infowindow.open(marker.get('map'), marker);
+                InforObj[0] = infowindow;
+            });
+            marker.addListener('mouseout', function () {
+                closeOtherInfo();
+                infowindow.close();
+                InforObj[0] = infowindow;
+            });
+        }
+    }
+
+
+
+
+
+
+
+    function closeOtherInfo() {
+        if (InforObj.length > 0) {
+            /* detach the info-window from the marker ... undocumented in the API docs */
+            InforObj[0].set("marker", null);
+            /* and close it */
+            InforObj[0].close();
+            /* blank the array */
+            InforObj.length = 0;
+        }
+    }
+    function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 8,
+            center: centerCords,
+            styles: [
+                {
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#242f3e"
+                        }
+                    ]
+                },
+                {
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#746855"
+                        }
+                    ]
+                },
+                {
+                    "elementType": "labels.text.stroke",
+                    "stylers": [
+                        {
+                            "color": "#242f3e"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "administrative",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "administrative.locality",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#d59563"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi",
+                    "stylers": [
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#d59563"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi.park",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#263c3f"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi.park",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#6b9a76"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#38414e"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "geometry.stroke",
+                    "stylers": [
+                        {
+                            "color": "#212a37"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "labels.icon",
+                    "stylers": [
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#9ca5b3"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#746855"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "geometry.stroke",
+                    "stylers": [
+                        {
+                            "color": "#1f2835"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#f3d19c"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "transit",
+                    "stylers": [
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "transit",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#2f3948"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "transit.station",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#d59563"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#17263c"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#515c6d"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "labels.text.stroke",
+                    "stylers": [
+                        {
+                            "color": "#17263c"
+                        }
+                    ]
+                }
+            ]
+        });
+        addMarker();
+    }
+
+    var xValues = ["Stopped", "Halted", "Moving"];
+    s = 0;
+    h = 0;
+    m = 0;
+    //alert(vehicle_mode)
+    for (var i = 0; i < vehicle_mode.length; i++) {
+        if (vehicle_mode[i] == "S") {
+            s++;
+        }
+        else if (vehicle_mode[i] == "H") {
+            h++;
+        }
+        else if (vehicle_mode[i] == "M") {
+            m++;
+        }
+    }
+    var stopped = document.getElementById("stopped");
+    var moving = document.getElementById("moving");
+    var idle = document.getElementById("idle");
+    moving.innerHTML = m;
+    idle.innerHTML = h;
+    stopped.innerHTML = s;
+    var yValues = [s, h, m];
+    var barColors = [
+        "#680000",
+        "#FFBA00",
+        "#0B6322",
+    ];
+    new Chart("myChart", {
+        type: "doughnut",
+        data: {
+            labels: xValues,
+            datasets: [{
+                backgroundColor: barColors,
+                borderWidth: [0, 0, 0, 0],
+                data: yValues
+            }]
+        },
+        options: {
+            plugin_one_attribute: 1,
+            aspectRatio: 1,
+            responsive: false,
+            maintainAspectRatio: true,
+            cutoutPercentage: 70,
+            legend: {
+                display: false,
+                position: 'bottom',
+
+                labels: {
+                    boxWidth: 15,
+                }
+            },
+        }
+    });
+    Chart.pluginService.register({
+
+        beforeDraw: function (chart) {
+            if (chart.config.options.plugin_one_attribute) {
+                var width = chart.chart.width,
+                    height = chart.chart.height,
+                    ctx = chart.chart.ctx;
+                ctx.restore();
+                var fontSize = (height / 90).toFixed(2);
+                ctx.font = fontSize + "em sans-serif";
+                ctx.fillStyle = '#FFFFFF';
+                var text = vehicle_mode.length,
+                    textX = Math.round((width - ctx.measureText(text).width) / 2),
+                    textY = height / 1.80;
+
+                ctx.fillText(text, textX, textY);
+                ctx.save();
+            }
+        }
+    });
+    $(window).scroll(function () {
+        var hT = $('#bar-chart').offset().top,
+            hH = $('#bar-chart').outerHeight(),
+            wH = $(window).height(),
+            wS = $(this).scrollTop();
+        console.log((hT - wH), wS);
+        if (wS > (hT + hH - wH)) {
+            if (flag == 0) {
+                // alert("called");
+                var token = '{{csrf_token}}';
+                $.ajax({
+                    headers: { "X-CSRFToken": token },
+                    url: "{% url 'user:ajax_fetch_graphs_data'%}",
+                    type: 'POST',
+                    data: {
+
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+
+                        // alert("Request: " + JSON.stringify(data));
+                        avg_speed = data.avg_speed;
+                        avg_engine = data.avg_engine_time;
+                        for (i = 0; i < data.coordinates.length; i++) {
+                            // alert(data.coordinates[i]);
+                            total_distance = 0;
+                            console.log(i + "th objcet");
+
+                            for (j = 0; j <= data.coordinates[i].length; j++) {
+
+
+                                try {
+                                    temp_latitude = data.coordinates[i][j]['latitude1'];
+                                    temp_longitude = data.coordinates[i][j]['longitude1'];
+                                    temp_new_latitude = data.coordinates[i][j + 1]['latitude1'];
+                                    temp_new_longitude = data.coordinates[i][j + 1]['longitude1'];
+                                    distance = getDistanceFromLatLonInKm(temp_latitude, temp_longitude, temp_new_latitude, temp_new_longitude)
+                                    if (distance < 10) {
+                                        console.log(distance);
+                                        total_distance = total_distance + distance;
+                                    }
+                                }
+                                catch (err) {
+                                    continue;
+                                }
+                            }
+                            distance_covered.push(total_distance);
+                            // alert(total_distance);
+                            //   alert(total_distance);
+                        }
+                        loadgraphs();
+                    },
+                    error: function (request, error) {
+                        // alert("Request: " + JSON.stringify(request));
+                    }
+                });
+                flag = 1;
+            }
+        }
+    });
+
+
+
+
+
+
+    function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+        var R = 6371; // Radius of the earth in km
+        var dLat = deg2rad(lat2 - lat1);  // deg2rad below
+        var dLon = deg2rad(lon2 - lon1);
+        var a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2)
+            ;
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = R * c; // Distance in km
+        return d;
+    }
+    function deg2rad(deg) {
+        return deg * (Math.PI / 180)
+    }
+
+
+
+
+
+
+
+
+    function loadgraphs() {
+        //  Average speed chart per day
+        var MeSeChart = new Chart("bar-chart", {
+
+            type: 'horizontalBar',
+            data: {
+                axis: 'y',
+                labels: vehicle_no,
+                datasets: [
+                    {
+                        label: "Distance (KM)",
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                        ],
+
+                        fill: false,
+                        data: distance_covered
+                    }
+                ]
+            },
+            options: {
+                
+                legend: {
+                    display: false
+                },
+                scales: {
+                    xAxes: [{
+
+                        ticks: {
+                            min: 0 // Edit the value according to what you need
+                        }
+                    }],
+                    yAxes: [{
+                        barPercentage: 0.2,
+                        stacked: true
+                    }]
+                },
+            }
+        });
+        // end
+        // daily distance chart all vehicles
+
+        var MeSeChart = new Chart("avgspeed", {
+
+            type: 'horizontalBar',
+            data: {
+                axis: 'y',
+                labels: vehicle_no,
+                datasets: [
+                    {
+                        label: "Speed (KM)",
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                        ],
+
+                        fill: false,
+
+
+                        data: avg_speed
+                    }
+                ]
+            },
+            options: {
+                legend: {
+                    display: false
+                },
+                scales: {
+                    xAxes: [{
+                        ticks: {
+                            min: 0 // Edit the value according to what you need
+                        }
+                    }],
+                    yAxes: [{
+                        barPercentage: 0.2,
+                        stacked: true
+                    }]
+                },
+            }
+        });
+
+        // // end
+
+
+        var MeSeChart = new Chart("linechart", {
+
+            type: 'horizontalBar',
+            data: {
+                axis: 'y',
+                labels: vehicle_no,
+                datasets: [
+                    {
+                        label: "Time (Hour)",
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                        ],
+                        fill: false,
+                        data: avg_engine
+                    }
+                ]
+            },
+            options: {
+                legend: {
+                    display: false
+                },
+                scales: {
+                    xAxes: [{
+
+                        ticks: {
+                            min: 0 // Edit the value according to what you need
+                        }
+                    }],
+                    yAxes: [{
+                        barPercentage: 0.2,
+                        stacked: true
+                    }]
+                },
+            }
+        });
+
+        $('#searchinput').on('input', function () {
+            var username = $("#searchinput").val();
+            if (username.length > 3) {
+                searchsubuser(username)
+            }
+            else if (username.length < 1) {
+                searchsubuser(username)
+            }
+        });
+        function searchsubuser(username) {
+            var token = '{{csrf_token}}';
+            $.ajax({
+                headers: { "X-CSRFToken": token },
+                url: "{% url 'user:load_subuser'%}",
+                type: 'POST',
+                data: {
+                    'username': username
+                },
+                dataType: 'json',
+                success: function (data) {
+
+                    $("#userTable").find("tr:not(:first)").remove();
+                    for (i = 0; i < data.userObject.length; i++) {
+                        $("#userTable > tbody").append("<tr><td>" +
+                            data.userObject[i].username +
+                            "</td><td>" +
+                            data.userObject[i].phone +
+                            "</td><td> <span class=iconify id = iconify data-icon=codicon:key data-inline=false></span> </td></tr>");
+                    }
+                },
+                error: function (request, error) {
+                    alert("Request: " + JSON.stringify(request));
+                }
+            });
+        }
+    }
+</script>
+{% endblock %}

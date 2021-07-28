@@ -1,0 +1,56 @@
+{% extends 'dealer/base.html' %}
+{% block maincontent %}
+    <div class="container-fluid mainContainer">
+        <div class="row">
+            <div class=" col-sm-12 col-md-6  paddingClass"
+                style="padding-bottom: 20px;  background-color:#0E1726; border-color: #888EA8; border-style: solid;border-width: 1px 0 0 0;border-radius: 5px;box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);">
+            <div>
+                <center>
+                    <h4 style="color: white; padding-top: 20px; padding-bottom: 20px;">Device Details</h1>
+                </center>
+            </div>
+            <form method="POST" action="{% url 'index:cetificate'%}" id="certificate_form">{% csrf_token %}
+
+                <label for="imei">IMEI<sup style="color: red;">*</sup></label>
+                <input type="text" id="imei" name="imei" autocomplete="off" required>
+
+                
+
+                <label for="Registration">Registration Number<sup style="color:red;">*</sup></label>
+                <input type="text" id="Registration" name="Registration" autocomplete="off" required>
+
+                <label for="chassis">Chassis Number<sup style="color:red;">*</sup></label>
+                <input type="text" id="chassis" name="chassis" autocomplete="off" required>
+
+
+                <label for="owner">Registered Owner Name<sup style="color: red;">*</sup></label>
+                <input type="text" id="owner" name="owner" autocomplete="off" required>
+
+
+                <label for="address">Owner Address<sup style="color: red;">*</sup></label>
+                <input type="text" id="address" name="address" autocomplete="off" required>
+
+
+                <label for="engine">Engine Number</label>
+                <input type="text" id="engine" name="engine" autocomplete="off">
+
+
+                <label for="installation_date">Installation Date</label>
+                <input type="date" placeholder="dd-mm-yyyy" id="installation_date" name="installation_date" required>
+                <br>
+                <center>
+                    <input type="submit" style="width: 150px; height: 40px; margin-top: 30px;" class="button1" id="submit_btn"
+                        value="Genarate">
+                </center>
+                
+            </form>
+        </div>
+    </div>
+    <script>
+        $("#imei").autocomplete({
+        source: "{% url 'index:ajax_load_user_imei' %}",
+    });
+
+   
+    </script>
+    {% endblock %}

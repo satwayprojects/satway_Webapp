@@ -1,0 +1,46 @@
+"""Satway2 URL Configuration
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/3.2/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.urls import path
+from . import views
+
+app_name = 'master'
+
+urlpatterns = [
+    path('dashboard/',views.dashboard,name = "Dashboard"),
+    path('adddevice/',views.addDevice,name = "addDevice"),
+    path('registration/',views.addDistributerPage,name = "addDistributer"),
+    path('checkusernamevalid',views.checkUsernameValid,name = "checkUsernameValid"),
+    path('allocatedevice/',views.allocateDevice,name = "allocateDevice"),
+    path('deviceStatusPage/',views.deviceStatusPage,name = "Status"),
+    path('reallocatedevice/',views.reallocateDevice,name = "reallocateDevice"),
+    path('inventory',views.inventory,name = "inventory"),
+    path('transactionsearch',views.transactionsearch,name = "transactionsearch"),
+    path('bulkadd/',views.bulkadd,name = "bulkAdd"),
+
+    path('ajax_password_reset',views.ajax_password_reset, name="ajax_password_reset"),
+    path('ajax_load_user',views.ajax_load_user,name = "ajax_load_user"),
+
+    path('inventory_sold',views.inventory_sold,name = "inventory_sold"),
+    path('inventory_active',views.inventory_active,name = "inventory_active"),
+    path('inventory_deactive',views.inventory_deactive,name = "inventory_deactive"),
+    path('inventory_dealer',views.inventory_dealer,name = "inventory_dealer"),
+    path('inventory_deactive_stock',views.inventory_deactive_stock,name = "inventory_deactive_stock"),
+    path('inventory_deactive_sold',views.inventory_deactive_sold,name = "inventory_deactive_sold"),
+
+    path('editprofile',views.editprofile,name = "editprofile"),
+    path('profile',views.change_password,name = "profile"),
+
+]

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% load static %}
+       
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!-- ===== CSS ===== -->
+        <link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
+       
+       
+
+        <!-- ===== BOX ICONS ===== -->
+        <link href='https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css' rel='stylesheet'>
+
+        <title>Satway</title>
+    </head>
+    <body>
+        <div class="login">
+            <div class="login__content">
+                <div class="login__img">
+                    <img id="satway_login_img" src="{% static 'img/satwayimg.png' %}" alt="">
+                </div>
+
+                <div class="login__forms">
+                    <form action="{% url 'accounts:loginPage' %}" method = "POST" class="login__registre" id="login-in">
+                        {% csrf_token %}
+                        <h1 class="login__title">Sign In</h1>
+
+                        <div class="login__box">
+                            <i class='bx bx-user login__icon'></i>
+                            <input type="text" placeholder="Username" class="login__input" name = "username" autocomplete="off">
+                        </div>
+
+                        <div class="login__box">
+                            <i class='bx bx-lock-alt login__icon'></i>
+                            <input type="password" placeholder="Password" class="login__input" name = password>
+                        </div>
+                        {% for message in messages %}
+                    <div class="alert alert-danger" style="color: red;">
+                        <a class="close" href="#" data-dismiss="alert"></a>
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                        
+
+                        <a href="{% url 'index:forgot_password' %}" class="login__forgot">Forgot password?</a>
+
+                        <input type = "submit" value = "Sign In" class="login__button">
+
+
+                        
+                    </form>
+                    
+                </div>
+            </div>
+        </div>
+        <!--===== MAIN JS =====-->
+        <script src="{% static 'js/login.js' %}"></script>
+    </body>
+</html>

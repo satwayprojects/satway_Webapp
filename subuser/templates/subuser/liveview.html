@@ -1,0 +1,348 @@
+{% extends 'user/base.html' %}
+{% block maincontent %}
+<div class="container-fluid" style=" margin-top:90px;">
+    <div class=" dashboard_main">
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="jumbotron dash_map" id="map">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var templat,templon;
+    var map;
+    var marker;
+    var InforObj = [];
+    var vehicle_no = "{{vehicle_no}}";
+    var latitude = "{{latitude}}";
+    var longitude = "{{ longitude}}";
+    let time_stamp = "{{ time_stamp}}";
+    var speed = "{{speed}}";
+    var vehicle_mode = "{{vehicle_mode}}";
+    setInterval(function () {
+        var token = '{{csrf_token}}';
+        $.ajax({
+            headers: { "X-CSRFToken": token },
+            url: "{% url 'subuser:ajax_load_live'%}",
+            type: 'POST',
+            data: {
+                'imei': "{{imei}}"
+            },
+            dataType: 'json',
+            success: function (data) {
+                vehicle_no = data.vehicle_no;
+                latitude = data.latitude;
+                longitude = data.longitude;
+                time_stamp = data.time_stamp;
+                speed = data.speed;
+                vehicle_mode = data.vehicle_mode;
+                
+                map.setCenter({
+                    lat: parseFloat(latitude),
+                    lng: parseFloat(longitude)
+                });
+                remove();
+                addMarker();
+            },
+            error: function (request, error) {
+                alert("Request: " + JSON.stringify(request));
+            }
+        });
+    }, 30000);
+    var centerCords = {
+        lat: parseFloat(latitude),
+        lng: parseFloat(longitude)
+    };
+    window.onload = function () {
+        initMap();
+    };
+    function remove() {
+        marker.setMap(null);
+    }
+    function addMarker() {
+        if (vehicle_mode == "M") {
+            mode = "Running"
+        }
+        else if (vehicle_mode == "S") {
+            mode = "Stopped"
+        }
+        else if (vehicle_mode == "H") {
+            mode = "Idle"
+        }
+        
+        var contentString = '<table>' +
+            '<tr><td style = "width :100px; font-size: 14px; color:#060817; font-weight : bold"> VEHICLE NO</td> <td style ="font-size: 14px; color:#060817; font-weight : bold">' + vehicle_no + '</td> </tr>' +
+            '<tr><td style = "color:black">SPEED</td><td style ="color:black">' + speed + '</td></tr>' +
+            '<tr><td style = "color:black">STATUS</td><td style ="color:black"> ' + mode + '</td></tr>' +
+            '<tr><td style = "color:black">LAST UPDATE</td><td style ="color:black">' + time_stamp + '</td></tr>' +
+            + '</table>';
+        marker = new google.maps.Marker({
+            position: { lat: parseFloat(latitude), lng: parseFloat(longitude) },
+            icon: {
+                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                strokeColor: "#FFDC34",
+                scale: 5
+            },
+           
+            //  vehicle no on pointer top
+            // label: { color: 'D59563', fontWeight: 'bold', fontSize: '14px', text: vehicle_no[i] },
+            map: map
+        });
+
+        
+        var newcoord = { lat: parseFloat(latitude), lng: parseFloat(longitude) };
+            var oldcoord = { lat: parseFloat(templat), lng: parseFloat(templon) }
+            var lineCoordinates = [
+                oldcoord,
+                newcoord,
+            ];
+            var linePath = new google.maps.Polyline({
+                path: lineCoordinates,
+                geodesic: true,
+                strokeColor: '#FF0000'
+            });
+            linePath.setMap(map);
+
+            templat = latitude;
+            templon = longitude;
+
+        const infowindow = new google.maps.InfoWindow({
+            content: contentString,
+        });
+        marker.addListener('click', function () {
+            closeOtherInfo();
+            infowindow.open(marker.get('map'), marker);
+            InforObj[0] = infowindow;
+        });
+        marker.addListener('mouseover', function () {
+            closeOtherInfo();
+            infowindow.open(marker.get('map'), marker);
+            InforObj[0] = infowindow;
+        });
+        marker.addListener('mouseout', function () {
+            closeOtherInfo();
+            infowindow.close();
+            InforObj[0] = infowindow;
+        });
+    }
+    function closeOtherInfo() {
+        if (InforObj.length > 0) {
+            /* detach the info-window from the marker ... undocumented in the API docs */
+            InforObj[0].set("marker", null);
+            /* and close it */
+            InforObj[0].close();
+            /* blank the array */
+            InforObj.length = 0;
+        }
+    }
+    function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 15,
+            center: centerCords,
+            styles: [
+                {
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#242f3e"
+                        }
+                    ]
+                },
+                {
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#746855"
+                        }
+                    ]
+                },
+                {
+                    "elementType": "labels.text.stroke",
+                    "stylers": [
+                        {
+                            "color": "#242f3e"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "administrative",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "administrative.locality",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#d59563"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi",
+                    "stylers": [
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#d59563"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi.park",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#263c3f"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi.park",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#6b9a76"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#38414e"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "geometry.stroke",
+                    "stylers": [
+                        {
+                            "color": "#212a37"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "labels.icon",
+                    "stylers": [
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#9ca5b3"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#746855"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "geometry.stroke",
+                    "stylers": [
+                        {
+                            "color": "#1f2835"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#f3d19c"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "transit",
+                    "stylers": [
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "transit",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#2f3948"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "transit.station",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#d59563"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#17263c"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#515c6d"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "labels.text.stroke",
+                    "stylers": [
+                        {
+                            "color": "#17263c"
+                        }
+                    ]
+                }
+            ]
+        });
+        addMarker();
+    }
+
+
+</script>
+
+
+
+{% endblock %}

@@ -1,0 +1,302 @@
+{% extends 'master/base.html' %}
+
+{% block maincontent %}
+
+    <div class="container-fluid mainContainer">
+        <div class="row">
+            <!-- <div class=" col-sm-2 col-md-2">
+
+            </div> -->
+            <div class=" col-sm-8 col-md-6 paddingClass">
+                <form action="{%url 'master:addDevice' %}" method="POST" id ="addDevicefrm">
+                    {%csrf_token%}
+                    <div>
+                        <center style="color: aliceblue; padding-top: 30px;"><h3>Add Device</h3></center> 
+                    </div>
+                    <div class="media-top">
+                        <label for="imei">IMEI Number</label>
+                        <input class ="input" type="text" name="imei" id="imei" required size = "15" autocomplete="off">
+                        <br><span class="error_form" id="imei_error_message"></span>
+                    </div>
+                    <div class="media-top">
+                        <label for="iccid">ICC ID Number</label>
+                        <input class ="input" type="text" name="iccid" id="iccid" required autocomplete="off">
+                        <br><span class="error_form" id="iccid_error_message"></span>
+                    </div>
+                    <div class="media-top">
+                        <label for="uid">Unique ID Number</label>
+                        <input class ="input" class="form-control" type="text" name="uid" id="uid" required autocomplete="off">
+                        <br><span class="error_form" id="uid_error_message"></span>
+                    </div>
+                    <div class="media-top">
+                        <label for="primaryNumber">Primary Number</label>
+                        <input class ="input" type="text" name="primaryNumber" id="primaryNumber" placeholder="BSNL No:" required autocomplete="off">
+                        <br><span class="error_form" id="p_error_message"></span>
+                    </div>
+                    <div class="media-top">
+                        <label for="secondaryNumber">Secondary Number</label>
+                        <input class ="input" type="text" name="secondaryNumber" id="secondaryNumber" placeholder="Vodofone No:" required autocomplete="off">
+                        <br><span class="error_form" id="s_error_message"></span>
+                    </div>
+                    <div class="media-top">
+                        <label for="version">Version</label>
+                        <input class ="input" type="text" name="version" id="version" placeholder="Firmware Version" required autocomplete="off">
+                        <br><span class="error_form" id="version_error_message"></span>
+                    </div>
+                    <div class="media-top">
+                        <label>Status</label>
+                        <input type="radio" id="act" name="act" value="1" default="true" required autocomplete="off" class = "radio">
+                        <label for="act" class = "radioLabel">Activated</label>
+                        <input type="radio" id="nact" name="act" value="2" class = "radio">
+                        <label for="nact" class = "radioLabel">Deactivated</label>
+                    </div>
+                    <div class="media-top">
+                        <label for="activationDate">Activation Date</label>
+                        <input class ="input" type="date" name="activationDate" id="activationDate">
+                    </div>
+                    <div class="button">
+                        
+                        <input type="submit" name="ADD Device" id="ADD Device" value="ADD" class = "sub-button">
+                        <input type="reset" name="reset" id="reset" value="Reset" class = "sub-button"><br>
+                        <span class="error_form" id="error_message"></span>
+                        
+                    </div>
+                    <h4 style="text-align: center;">{{status1}}</h4>
+                </form>
+            </div>
+            <div class=" col-sm-1 col-md-1">
+
+            </div>
+            <div class=" col-sm-3 col-md-5 paddingClass">
+                <form action="{%url 'master:bulkAdd' %}"  method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div>
+                        <center><h3 style="color: aliceblue; padding-top: 30px;">Add Device</h3></center> 
+                    </div>  
+                    <center>
+                    <input type="file"
+                           title="Upload excel file"
+                           name="excel_file"
+                           style="border: 1px solid black; padding: 5px; height: 100px; width:90%;"
+                           required="required">
+                        <br>
+                        <input type="submit"
+                            value="ADD"
+                            class = "sub-button" style = "margin-top: 30px;"></center>
+                    <h4 style="color: azure;">{{ status2 }}</h4>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+    <script type="text/javascript">
+        $(function() {
+            
+            $("#imei_error_message").hide();
+            $("#uid_error_message").hide();
+            $("#iccid_error_message").hide();
+            $("#p_error_message").hide();
+            $("#s_error_message").hide();
+            $("#version_error_message").hide();
+            $("#error_message").hide();
+
+            var error_imei = false;
+            var error_iccid = false;
+            var error_uid = false;
+            var error_p = false;
+            var error_s = false;
+            var error_version = false;
+            var error_date = false;
+            var radiocheck = 0;
+            $("#imei").focusout(function(){
+                check_imei();
+            });
+
+            $("#iccid").focusout(function(){
+                check_iccid();
+            });
+
+            $("#uid").focusout(function(){
+                check_uid();
+            });
+            $("#primaryNumber").focusout(function(){
+                check_primaryNumber();
+            });
+            $("#secondaryNumber").focusout(function(){
+                check_secondaryNumber();
+            });
+            $("#version").focusout(function(){
+                check_version(); 
+            });
+            $('#addDevicefrm input[name=act]').on('change', function() {
+                if($('input[name=act]:checked', '#addDevicefrm').val() != 1){
+                    $("#activationDate").prop('disabled', true);
+                    $("#activationDate").css("background-color","#36415A");
+                    $("#activationDate").css("opacity"," 0.2");
+                    document.getElementById("activationDate").value = "";
+                    radiocheck = 0;
+                }
+                else{
+                    $("#activationDate").prop('disabled', false);
+                    $("#activationDate").css("background-color","#232E48");
+                    $("#activationDate").css("opacity","1");
+                    radiocheck = 1;
+                }
+                
+                });
+            function check_imei() {
+                var pattern = /^[0-9]*$/;
+                var imei = $("#imei").val();
+                if (pattern.test(imei) && imei !== '' && imei.charAt(0) != 0 && imei.length == 15) {
+                    $("#imei_error_message").hide();
+                    $("#imei").css("border-bottom","2px solid #34F458");
+                    error_imei = false;
+                } 
+                else {
+                    $("#imei_error_message").html("Not Valid");
+                    $("#imei_error_message").show();
+                    $("#imei").css("border-bottom","2px solid #F90A0A");
+                    error_imei = true;
+           
+            }
+            }
+            function check_iccid() {
+                var pattern = /^[a-zA-Z0-9]*$/;
+                var iccid = $("#iccid").val();
+                if (pattern.test(iccid) && iccid !== '' && iccid.charAt(0) != 0 ) {
+                    $("#iccid_error_message").hide();
+                    $("#iccid").css("border-bottom","2px solid #34F458");
+                    error_iccid = false;
+                } 
+                else {
+                    $("#iccid_error_message").html("Not Valid");
+                    $("#iccid_error_message").show();
+                    $("#iccid").css("border-bottom","2px solid #F90A0A");
+                    error_iccid = true;
+            }
+            }
+
+            function check_uid() {
+                var pattern = /^[a-zA-Z0-9]*$/;
+                var uid = $("#uid").val();
+                if (pattern.test(uid) && uid !== '' && uid.charAt(0) != 0) {
+                    $("#uid_error_message").hide();
+                    $("#uid").css("border-bottom","2px solid #34F458");
+                    error_uid = false;
+                } 
+                else {
+                    $("#uid_error_message").html("Not Valid");
+                    $("#uid_error_message").show();
+                    $("#uid").css("border-bottom","2px solid #F90A0A");
+                    error_uid = true;
+            }
+            }
+
+            function check_primaryNumber() {
+                var pattern = /^[0-9]*$/;
+                var primaryNumber = $("#primaryNumber").val();
+                if (pattern.test(primaryNumber) && primaryNumber !== '' && primaryNumber.charAt(0) != 0 && primaryNumber.length == 13) {
+                    $("#p_error_message").hide();
+                    $("#primaryNumber").css("border-bottom","2px solid #34F458");
+                    error_p = false;
+                } 
+                else {
+                    $("#p_error_message").html("Not Valid");
+                    $("#p_error_message").show();
+                    $("#primaryNumber").css("border-bottom","2px solid #F90A0A");
+                    error_p = true;
+            }
+            }
+
+            function check_secondaryNumber() {
+                var pattern = /^[0-9]*$/;
+                var secondaryNumber = $("#secondaryNumber").val();
+                if (pattern.test(secondaryNumber) && secondaryNumber !== '' && secondaryNumber.charAt(0) != 0 && secondaryNumber.length == 13) {
+                    $("#s_error_message").hide();
+                    $("#secondaryNumber").css("border-bottom","2px solid #34F458");
+                    error_s = false;
+                } 
+                else {
+                    $("#s_error_message").html("Not Valid");
+                    $("#s_error_message").show();
+                    $("#secondaryNumber").css("border-bottom","2px solid #F90A0A");
+                    error_s = true;
+            }
+            }
+
+            function check_version() {
+                var pattern = /^[a-zA-Z0-9]*$/;
+                var version = $("#version").val();
+                if (pattern.test(version) && version !== '' && version.charAt(0) != 0) {
+                    $("#version_error_message").hide();
+                    $("#version").css("border-bottom","2px solid #34F458");
+                    error_version = false;
+                } 
+                else {
+                    $("#version_error_message").html("Not Valid");
+                    $("#version_error_message").show();
+                    $("#version").css("border-bottom","2px solid #F90A0A");
+                    error_version = true;
+            }
+            }
+          
+            function check_date(){
+                if(radiocheck == 1){
+                    if($("#activationDate").val() == ""){
+                        error_date = true;
+                    }
+                    else{
+                        error_date = false;
+                    }
+                }
+                else{
+                    error_date = false;
+                }
+            }
+            
+
+            $("#addDevicefrm").submit(function() {
+            
+
+                check_date();
+                check_imei();
+                
+
+           
+                check_iccid();
+            
+
+          
+                check_uid();
+            
+                check_primaryNumber();
+            
+                check_secondaryNumber();
+            
+                check_version(); 
+            
+
+            if (error_imei == false && error_iccid == false && error_uid == false && error_p == false && error_s == false && error_version == false && error_date == false) {
+               $("#error_message").html("Successfull");
+               $("#error_message").css("color","#34F458");
+               $("#error_message").show();
+               return true;
+            } else {
+              
+               $("#error_message").html("Not Valid form");
+               $("#error_message").show();
+               return false;
+            }
+
+
+         });
+      });
+
+     
+    </script>
+
+{% endblock %}

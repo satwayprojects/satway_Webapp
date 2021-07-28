@@ -1,0 +1,81 @@
+@import url('http://fonts.cdnfonts.com/css/sofachrome');
+body{
+    background: #060818;
+    color:#D9E6ED;
+}
+.jumbotron{
+    margin-top:20px;
+    background: #060818;
+}
+.logo{
+    height:450px;
+    width:100%;
+    align-items:center;
+}
+.satway{
+    color: #009688;
+    font-weight:400;
+    font-family: 'Sofachrome Rg', sans-serif;
+}
+h1{
+    color:#bfc9d4;
+    font-size:2.5rem;
+    margin-bottom: .5rem;
+    font-weight:500;
+
+}
+.form-group {
+   margin-bottom: 30px;
+
+}
+.btn{
+background-color:#F4C35B;
+}
+.input-group>.form-control:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    color: white;
+}
+.form-control {
+   min-height: 38px;
+   padding-left: 10px;
+   background: transparent;
+    border-width: 0 0 0 0;
+   border-radius: 0;
+
+}
+   .form-control:focus {
+    box-shadow:none;
+    border-color:none;
+   background: transparent;
+}
+input:focus{
+        outline: none;
+
+    }
+
+.input-group-addon {
+   max-width: 50px;
+   text-align: center;
+   background: none;
+   border-width: 0 0 0 0;
+   padding-left: 0px;
+   border-radius: 0;
+   background: transparent;
+   width:30px;
+
+}
+.bi {
+
+    font-size: 20px;
+    color: #009688;
+}
+ a, a:hover, a:focus, a:active {
+      text-decoration: none;
+      color: #009688;
+ }
+ .input-group{
+ border: 1px solid black;
+ border-color:#009688;
+border-width: 0 0 1px 0;
+ }

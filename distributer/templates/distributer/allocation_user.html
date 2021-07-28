@@ -1,0 +1,120 @@
+{% extends 'distributer/base.html' %}
+{% block maincontent %}
+<style>
+    .btn-success {
+        width: 40%;
+    }
+
+    .btnDelete {
+        width: 80px;
+        height: 30px;
+        padding-left: 10px;
+        padding-right: 10px;
+
+        background-color: #36415A;
+        color: white;
+        margin: 1px 0;
+
+        font-size: 13px;
+        cursor: pointer;
+        border: 1px solid #f12043;
+        border-radius: 4px;
+    }
+
+    ::marker {
+        color: red;
+        font-size: 1.2em;
+    }
+
+    li {
+        color: red;
+    }
+
+    .helptext {
+        color: white;
+        text-align: justify;
+    }
+
+    label {
+        /* Other styling... */
+        text-align: left;
+        clear: both;
+        float: left;
+
+    }
+
+    span {
+        display: inline-block;
+        text-align: left;
+    }
+
+    input {
+        width: 60%;
+    }
+</style>
+
+<form action="{% url 'distributer:deviceAllocationUser'%}" method="POST" autocomplete="off">
+    {% csrf_token %}
+    <div class="container-fluid mainContainer">
+        <div class="row">
+            <!-- <div class=" col-sm-2 col-md-2">
+            
+            </div> -->
+            
+            <div class=" col-sm-12 col-md-5  paddingClass "
+                style="padding-bottom: 20px;  background-color:#0E1726; border-color: #888EA8; border-style: solid;border-width: 1px 0 0 0;border-radius: 5px;box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);">
+
+                <div>
+                    <center>
+                        <h4 style="color: white; padding-top: 20px; padding-bottom: 20px;">User Details</h1>
+                    </center>
+                </div>
+                {{ form.as_p }}
+                <!-- <p style="color: azure;">{{status}}</p> -->
+            </div>
+
+            <div class=" col-sm-1 col-md-1">
+            </div>
+            <div class=" col-sm-12 col-md-5 paddingClass"
+                style="padding-bottom: 20px;  background-color:#0E1726; border-color: #888EA8; border-style: solid;border-width: 1px 0 0 0;border-radius: 5px;box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);">
+
+                <div>
+                    <center>
+                        <h4 style="color: white; padding-top: 20px; padding-bottom: 20px;">Device & Vehicle Details</h1>
+                    </center>
+                </div>
+                {{ form2.as_p }}
+                <center><input type="submit" class="btn-success" style="width:50%;" value="Allocate"></center>
+                <div class="button">
+                    <span class="error_form" id="error_message"></span>
+                    <h4 style="color: rgb(255, 0, 0);text-align: center;">{{status}}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    var username_err = "T"
+    var imeilist = null
+
+    $("#id_imei").autocomplete({
+        minLength: 5,
+        source: "{% url 'index:ajax_load_user_imei' %}",
+        minLength: 5,
+    });
+
+
+    $("#id_username").autocomplete({
+        source: "{% url 'index:ajax_check_user_username' %}",
+        minLength: 4,
+        select: function (event, ui) {
+            event.preventDefault();
+            var selectedArr = ui.item.value.split(",");
+            $("#id_username").val(selectedArr[0]);
+            $("#id_phone").val(selectedArr[1]);
+        }
+    });
+
+</script>
+{% endblock %}

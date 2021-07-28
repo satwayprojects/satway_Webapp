@@ -1,0 +1,168 @@
+{% extends 'index/base.html' %}
+{% block maincontent %}
+<div class="container-fluid maincontainer">
+    <div class="row section-3">
+        <div class="row" style="padding-left: 30px; padding-right: 0; padding-top: 10px; ">
+            <div class="col-sm-6 col-md-6" style=" float: right; clear: both;">
+                <label style="width: 60px;" id="searchdevice">Search</label>
+                <input type="text" name="searchdevice" id="searchinput" placeholder="Search with lat 5 digits IMEI">
+            </div>
+            <div class="col-sm-6 col-md-6" style=" float: right; clear: both;">
+                
+                    <label style="width: 60px;" id="salesearchdevice">Search</label>
+                    <input type="text" name="searchdevice" id="salesearchinput"
+                        placeholder="Search with lat 5 digits IMEI">
+               
+            </div>
+        </div>
+        <div class="row" style="padding-left: 30px; padding-right: 0; padding-top: 10px;">
+            <div class="col-sm-6 col-md-6 ">
+                <h3 style="color: azure;">Stock Table</h3>
+                <div class="table-responsive">
+                    <table class="table table-striped table-borderless table-hover tbl" id="imeiTable">
+                        <thead>
+                            <tr>
+                                <th scope="col">IMEI Number</th>
+                                <th scope="col">Primary No</th>
+                                <th scope="col">Secondary No</th>
+                                <th scope="col">Validity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rec in device %}
+                            <tr>
+                                <th scope="row">{{rec.imei }}</th>
+                                <td>{{rec.primary_contact }}</td>
+                                <td>{{rec.secondary_contact }}</td>
+                                <td>{{rec.activation_date}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-sm-6 col-md-6">
+                <h3 style="color: azure;">Transaction Table</h3>
+                <div class="table-responsive">
+                    <table class="table table-striped table-borderless table-hover tbl" id = "transactiontable">
+                        <thead>
+                            <tr>
+                                <th scope="col">IMEI Number</th>
+                                <th scope="col">Owner</th>
+                                <th scope="col">Sale Date</th>
+                                <th scope="col">Validity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rec in transaction %}
+                            <tr>
+                                <th scope="row">{{rec.imei_id }}</th>
+                                <td>{{rec.sold_to_id }}</td>
+                                <td>{{rec.transaction_date }}</td>
+                                <td></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    
+    $('#searchinput').on('input', function () {
+        var imei = $("#searchinput").val();
+        if (imei.length > 5) {
+            searchimei(imei)
+        }
+    });
+    $('#salesearchinput').on('input', function () {
+        var imeino = $("#salesearchinput").val();
+        if (imeino.length > 5) {
+      
+            searchsales(imeino)
+        }
+    });
+    function searchimei(imei) {
+        var token = '{{csrf_token}}';
+        $.ajax({
+            headers: { "X-CSRFToken": token },
+            url: "{% url 'index:inventory'%}",
+            type: 'POST',
+            data: {
+                'imei': imei
+            },
+            dataType: 'json',
+            success: function (data) {
+                if (data.state == "F") {
+                    // alert("array before splice" + imeilist)
+                    const index = imeilist.indexOf(data.imei);
+                    // alert("arrayIndex" + index)
+                    if (index > -1) {
+                        imeilist.splice(index, 1);
+                    }
+                    // alert("array after splice" + imeilist)
+                }
+                else {
+                    $("#imeiTable").find("tr:not(:first)").remove();
+                    for (i = 0; i < data.imeiObject.length; i++) {
+                        $("#imeiTable > tbody").append("<tr><td class = imei>" +
+                            data.imeiObject[i].imei +
+                            "</td><td>" +
+                            data.imeiObject[i].primary_contact +
+                            "</td><td>" +
+                            data.imeiObject[i].secondary_contact +
+                            "</td><td>" +
+                            data.imeiObject[i].activation_date + "</td></tr>");
+                    }
+                }
+            },
+            error: function (request, error) {
+                alert("Request: " + JSON.stringify(request));
+            }
+        });
+    }
+
+    function searchsales(imei) {
+        var token = '{{csrf_token}}';
+        $.ajax({
+            headers: { "X-CSRFToken": token },
+            url: "{% url 'index:transactionsearch'%}",
+            type: 'POST',
+            data: {
+                'imei': imei
+            },
+            dataType: 'json',
+            success: function (data) {
+                if (data.state == "F") {
+                    // alert("array before splice" + imeilist)
+                    const index = imeilist.indexOf(data.imei);
+                    // alert("arrayIndex" + index)
+                    if (index > -1) {
+                        imeilist.splice(index, 1);
+                    }
+                    // alert("array after splice" + imeilist)
+                }
+                else {
+                    $("#transactiontable").find("tr:not(:first)").remove();
+                    for (i = 0; i < data.imeiObject.length; i++) {
+                        $("#transactiontable > tbody").append("<tr><td class = imei>" +
+                            data.imeiObject[i].imei_id +
+                            "</td><td>" +
+                            data.imeiObject[i].sold_to_id  +
+                            "</td><td>" +
+                            data.imeiObject[i].transaction_date +
+                            "</td><td>" +
+                            data.imeiObject[i].activation_date + "</td></tr>");
+                    }
+                }
+            },
+            error: function (request, error) {
+                alert("Request: " + JSON.stringify(request));
+            }
+        });
+    }
+
+</script>
+{% endblock %}

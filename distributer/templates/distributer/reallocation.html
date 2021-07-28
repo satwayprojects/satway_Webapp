@@ -1,0 +1,121 @@
+{% extends 'distributer/base.html' %}
+{% block maincontent %}
+
+<style>
+    input {
+        width: 60%;
+    }
+</style>
+<div class="container-fluid mainContainer">
+    <div class="row">
+        <div class="col-sm-4 col-md-4  " style="background-color:#0E1726; border-color: #888EA8; border-style: solid;border-width: 1px 0 0 0;border-radius: 5px;box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);  height: auto">
+                <center><label style="text-align: center;" class="title">Reallocation</label><br></center>
+                <form action="{ url 'distributer:reallocateDevice'}" method="POST" id="addDevicefrm" autocomplete="off">
+                    {%csrf_token%}
+                    <div class="input-group">
+                        <input type="text" name="imei" id="imei" required>
+                        <label class="label-top">15 Digit IMEI No:</label>
+                        <br><span class="error_form" id="imei_error_message"></span>
+                        <br><span class="error_form" id="phone"></span>
+                    </div>
+                    <center>
+                        <input type="button" name="submit" id="submit" value="Reallocate" class="button-submit">
+                        <span class="error_form" id="error_message"></span>
+                        <h4 style="color: red;">{{status}}</h4>
+                    </center>
+                </form>
+            
+        </div>
+    </div>
+</div>
+<script>
+    var Imei;
+    $('#submit').attr('disabled', 'disabled');
+    $('#submit').css("opacity", "0.2")
+    $('#submit').css("pointer-events", "none")
+    $('#imei').on('input', function () {
+
+        var imei = $("#imei").val();
+        if (imei.length == 15) {
+            Imei = imei
+            checkvalid();
+        }
+    });
+
+    $('#imei').change(function () {
+        if ($('#imei').val == null) {
+            $('#phone').hide();
+            $('#imei_error_message').hide();
+        }
+
+    });
+
+
+    function checkvalid() {
+        var token = '{{csrf_token}}';
+        $.ajax({
+            headers: { "X-CSRFToken": token },
+            url: "{% url 'index:checkReallocationStatus'%}",
+            type: 'POST',
+            data: {
+                'imei': Imei
+            },
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == "F") {
+                    alert("IMEI not available for Reallocation.")
+                    $('#imei').val(null)
+                    // $("#imei_error_message").html("Device Not Found");
+                    // $("#imei_error_message").css("color", "red")
+                    // $("#imei_error_message").show();
+                    // $('#submit').attr('disabled', 'disabled');
+                    // $('#submit').css("opacity","0.2")
+                    // $('#submit').css("pointer-events","none")
+                    $('#phone').hide();
+                    $('#imei_error_message').hide();
+                }
+                else {
+                    $("#phone").css("color", "white");
+                    $("#phone").html("User Phone Number : " + data.phone);
+                    $("#phone").show();
+                    $("#imei_error_message").css("color", "white");
+                    $("#imei_error_message").html("Device owned by : " + data.status);
+                    $("#imei_error_message").show();
+                    $('#submit').removeAttr('disabled');
+                    $('#submit').css("opacity", "1");
+                    $('#submit').css("pointer-events", "auto");
+
+                }
+                // alert("data: " + data.status);
+            },
+            error: function (request, error) {
+                alert("Request: " + JSON.stringify(request));
+            }
+        });
+    }
+
+
+    $('#submit').on('click', function () {
+        var token = '{{csrf_token}}';
+        $.ajax({
+            headers: { "X-CSRFToken": token },
+            url: "{% url 'distributer:reallocateDevice'%}",
+            type: 'POST',
+            data: {
+                'imei': $('#imei').val()
+            },
+            dataType: 'json',
+            success: function (data) {
+                $('#imei').val(null);
+                $("#imei_error_message").css("color", "white");
+                $("#imei_error_message").html(data.status);
+                $('#phone').hide();
+            },
+            error: function (request, error) {
+                $("#imei_error_message").css("color", "red")
+                $("#imei_error_message").html("Some Error Occured");
+            }
+        });
+    });
+</script>
+{%endblock%}

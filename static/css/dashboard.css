@@ -1,0 +1,38 @@
+body{
+    background-color:#060817;
+    color:#fff;
+}
+
+.dashboard_main{
+    margin-top:20px;
+}
+.dash_map{
+    padding:0 0 0 0;
+    background-color:#0E1726;
+    height:400px;
+    width:100%;
+
+}
+.jumbotron{
+background-color:#0E1726;
+}
+.dash_status{
+    padding:20px 30px 15px 30px;
+    background-color:#0E1726;
+    height:auto;
+    width:100%;
+
+}
+#myChart{
+            border: 0px solid black;
+            height: 300px;
+            width: 300px;
+
+        }
+.vehicle_status{
+    font-size: 1rem;
+    font-weight: bolder;
+}
+#myChart:hover{
+transform: scale(1);
+}

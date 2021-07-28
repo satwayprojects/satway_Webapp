@@ -1,0 +1,108 @@
+{% extends 'dealer/base.html' %}
+{% block maincontent %}
+
+<style>
+    .btn-success{
+        width:100px;
+    }
+    .dist_registration{
+        height:100%;
+        background-color:#0E1726;
+        padding:5% 5% 0% 5%;
+        color:white;
+        border-color: #888EA8;
+    border-style: solid;
+    border-width: 1px 0 0 0;
+    border-radius: 5px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);}
+
+    ::marker {
+  color: red;
+  font-size: 1.2em;
+    }
+  li{
+    color:red;
+    float:right;
+  }
+ 
+    .helptext{
+        color:#888EA8;
+        text-align: justify;
+        font-style: italic;
+        font-size: small;
+        float:right;
+    }
+    label {
+        /* Other styling... */
+        margin-top: 2%;
+        text-align: left;
+        clear: both;
+        float:left;
+        font-size: 100%;
+        
+    }
+    span{
+        display: inline-block;
+        text-align:left;
+    }   
+    textarea{
+        background-color: #232E48;
+        border: 1px solid #36415A;
+        border-radius: 5px;
+        color: white;
+        width: 60%;
+        margin-top: 2%;
+    }     
+    
+    input {
+        width: 60%;
+        margin-top: 2%;
+    }
+    textarea:focus{
+        outline: none;
+    }
+</style>
+
+<div class="container-fluid "style=" margin-top:90px;">
+    <form action="{% url 'dealer:userRegisteration'%}" method="POST" autocomplete="off">
+        {%csrf_token%}
+        <div class="profile_main_div">
+            <div class="panel-group">
+            <div class="row">
+                <div class="col-md-6 col-sm-6 col-xs-6">
+                    <div class="jumbotron dist_registration">
+                        <div style="height:35px;"><center><h3 style="color:#fff;">User Registration</h3></center></div><br>
+                        {{ form1.as_p }}
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6 col-xs-6">
+                    <div class="jumbotron dist_registration" style="padding-top: 85px;" >
+                        {{ form2.as_p }}
+                        
+                        <div class="form-group row">
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-8">
+                                <center><input type="submit" class="btn btn-success" value="Register"></center>
+                            </div>
+                        </div>
+                        
+                        <p style="color: red;">{{status}}</p>
+                            
+                            {% if success_message %}
+                              <h4 class=""><center style="color:green"><b>{{ success_message }}</b></center></h4>
+                          {% endif %}
+                            </div> 
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+          </form>
+</div>
+
+
+
+
+
+{% endblock %}

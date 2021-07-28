@@ -1,0 +1,114 @@
+
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css");
+body{
+    background-color:#060817;
+    color:#fff;
+}
+.bottom {
+   
+    bottom: 0;
+
+  }
+.card_main{
+    margin-top:20px;
+}
+.base_block {
+max-width: 33.3333333%;
+    height: 30px;
+    margin-right: 0px;
+    float: left;
+    width: 34%;
+    text-align: center;
+border-style: groove;
+    cursor: pointer;
+    background-color:#0E1726;
+
+}
+.base_block:hover{
+background-color:#3B3F5C;
+}
+.card_nav_width{
+height:2px;
+}
+.card_navbar{
+    background-color:#0E1726;
+    margin-top:20px;
+
+}
+
+
+.card_button{
+    width:150px;
+    background-color:#0E1726;
+}
+
+.card_button:hover{
+    background-color:#3B3F5C;
+}
+
+.card_icon{
+padding-right:10px;
+}
+
+.card_box{
+   
+    background-color:#0E1726;
+    padding:5% 5% 2% 5%;
+  min-height: 200px;
+    width:100%;
+}
+.base-row{
+height:60px;
+
+}
+
+.vehicle_name{
+    background:#3B3F5C;
+    border-radius: 20px;
+    padding-bottom: 1px;
+    padding-top: 2px;
+    padding-left: 13px;
+    border-bottom-right-radius: 0px;
+    border-top-right-radius: 0px;
+    font-weight: bolder;
+    color: #FFF;
+    padding-right: 6px;
+    height: 23px;
+    margin-top: 2px;
+    font-size: 13px;
+}
+
+.card_img{
+    padding:0% 5% 10% 5%;
+    height: 50px;
+    width: 100px;
+    display: flex;justify-content: center;
+}
+.vehicle_speed {
+    font-size: 20px;
+    font-weight: 300;
+    color: #fff;
+}
+
+.card_middle-row {
+    padding-left: 4px;
+    padding-right: 2px;
+
+}
+
+.card_details{
+    margin-left:10px;
+    width: 50%;
+    height: 100px;
+    display:flex;
+
+}
+
+.card_img:hover {
+  /* -ms-transform: scale(1.5); IE 9 */
+  /* -webkit-transform: scale(1.5); Safari 3-8 */
+  transform: scale(1.1);
+}
+.odometer, .daily_distance{
+font-size: 12px;
+}

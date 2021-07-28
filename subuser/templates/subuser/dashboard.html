@@ -1,0 +1,387 @@
+{% extends 'subuser/base.html' %}
+
+{% block maincontent %}
+<div class="container-fluid " style=" margin-top:90px;">
+    <div class=" dashboard_main">
+        <div class="row">
+            <div class="col-md-9 col-sm-9 col-xs-9" style="margin-left: -27px; margin-top: -6px;">
+                <div class="jumbotron dash_map" id="map" style=" margin-left:0px; width : 103%; height: 500px;">
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-3" style=" margin-top: -6px; margin-left: 20px; height: 100%;">
+                <div class="jumbotron dash_status">
+                    <center class="vehicle_status" style="padding-bottom: 30px;">VEHICLE STATUS</center>
+                    <canvas id="myChart" style="width:100%;height:280px;"></canvas>
+                    <center class="vehicle_status" style="padding-bottom: 20px;">TOTAL VEHICLES</center>
+                    <center><h1>{{latitude|length}}</h1></center>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-6" style="margin-top: -12px;  margin-left: -27px; width: 110%;">
+                <div class="jumbotron">
+                    
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-6" style="margin-top: -12px;margin-left: 20px; ">
+                <div class="jumbotron">
+                    
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    var InforObj = [];
+    var vehicle_no = {{ vehicle_no| safe }};
+    var latitude = {{ latitude| safe }};
+    var longitude = {{ longitude| safe }};
+    var time_stamp = {{ time_stamp| safe }};
+    var speed = {{ speed| safe }};
+    var vehicle_mode = {{ vehicle_mode| safe }};
+    var centerCords = {
+        lat: parseFloat(latitude[0]),
+        lng: parseFloat(longitude[0])
+    };
+    window.onload = function () {
+        initMap();
+    };
+    function addMarker() {
+        for (var i = 0; i < latitude.length; i++) {
+            var contentString = '<table>' + 
+                                            '<tr><td style = "color:black">Last upadate : </td<td>' + time_stamp[i] + '</td></tr>'+ 
+                                            '<tr><td style = "color:black">vehicle No : </td<td>' + vehicle_no[i] + '</td></tr>' +
+                                            '<tr><td style = "color:black">Speed : </td<td>' + speed[i] + '</td></tr>' +
+                                            
+                                            + '</table>';
+            const marker = new google.maps.Marker({
+                position: { lat: parseFloat(latitude[i]), lng: parseFloat(longitude[i]) },
+                icon: {
+                    path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                    strokeColor: "#FFDC34",
+                    scale: 5
+                },
+
+                //  vehicle no on pointer top
+                // label: { color: 'D59563', fontWeight: 'bold', fontSize: '14px', text: vehicle_no[i] },
+                map: map
+            });
+            const infowindow = new google.maps.InfoWindow({
+                content: contentString,
+            });
+            marker.addListener('click', function () {
+                closeOtherInfo();
+                infowindow.open(marker.get('map'), marker);
+                InforObj[0] = infowindow;
+            });
+            marker.addListener('mouseover', function () {
+                closeOtherInfo();
+                infowindow.open(marker.get('map'), marker);
+                InforObj[0] = infowindow;
+            });
+            marker.addListener('mouseout', function () {
+                closeOtherInfo();
+                infowindow.close();
+                InforObj[0] = infowindow;
+            });
+        }
+    }
+
+
+
+  
+
+
+
+    function closeOtherInfo() {
+        if (InforObj.length > 0) {
+            /* detach the info-window from the marker ... undocumented in the API docs */
+            InforObj[0].set("marker", null);
+            /* and close it */
+            InforObj[0].close();
+            /* blank the array */
+            InforObj.length = 0;
+        }
+    }
+    function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 8,
+            center: centerCords,
+            styles: [
+                {
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#242f3e"
+                        }
+                    ]
+                },
+                {
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#746855"
+                        }
+                    ]
+                },
+                {
+                    "elementType": "labels.text.stroke",
+                    "stylers": [
+                        {
+                            "color": "#242f3e"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "administrative",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "administrative.locality",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#d59563"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi",
+                    "stylers": [
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#d59563"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi.park",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#263c3f"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "poi.park",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#6b9a76"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#38414e"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "geometry.stroke",
+                    "stylers": [
+                        {
+                            "color": "#212a37"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "labels.icon",
+                    "stylers": [
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#9ca5b3"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#746855"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "geometry.stroke",
+                    "stylers": [
+                        {
+                            "color": "#1f2835"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "road.highway",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#f3d19c"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "transit",
+                    "stylers": [
+                        {
+                            "visibility": "off"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "transit",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#2f3948"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "transit.station",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#d59563"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "geometry",
+                    "stylers": [
+                        {
+                            "color": "#17263c"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "labels.text.fill",
+                    "stylers": [
+                        {
+                            "color": "#515c6d"
+                        }
+                    ]
+                },
+                {
+                    "featureType": "water",
+                    "elementType": "labels.text.stroke",
+                    "stylers": [
+                        {
+                            "color": "#17263c"
+                        }
+                    ]
+                }
+            ]
+        });
+        addMarker();
+    }
+
+
+    //  Reverse geocoder code 
+//     function getReverseGeocodingData(lat, lng) {
+//     var latlng = new google.maps.LatLng(lat, lng);
+//     // This is making the Geocode request
+//     var geocoder = new google.maps.Geocoder();
+//     geocoder.geocode({ 'latLng': latlng },  (results, status) =>{
+//         if (status !== google.maps.GeocoderStatus.OK) {
+//             alert(status);
+//         }
+//         // This is checking to see if the Geoeode Status is OK before proceeding
+//         if (status == google.maps.GeocoderStatus.OK) {
+//             var address = (results[0].formatted_address);
+//             alert(address)
+//             return address;
+
+//         }
+//     });
+// }
+
+ // chart
+ var xValues = ["Stopped", "Halted", "Moving"];
+ s=0;
+ h=0;
+ m=0;
+//  alert(vehicle_mode)
+ for (var i = 0; i < vehicle_mode.length; i++) {
+    if(vehicle_mode[i] == "S"){
+        s++;
+    }
+    else if(vehicle_mode[i] == "H"){
+        h++;
+    }
+    else if(vehicle_mode[i] == "M"){
+        m++;
+    }
+ }
+    var yValues = [s, h, m];
+    var barColors = [
+        "#FFBA00",
+        "#680000",
+        "#0B6322",
+
+    ];
+    new Chart("myChart", {
+        type: "doughnut",
+        data: {
+            labels: xValues,
+
+            datasets: [{
+                backgroundColor: barColors,
+                borderWidth: [0, 0, 0, 0],
+
+                data: yValues
+            }]
+        },
+        options: {
+
+            aspectRatio: 1,
+            responsive: false,
+            maintainAspectRatio: true,
+            cutoutPercentage: 70,
+
+            legend: {
+                display: true,
+                position: 'bottom',
+
+                labels: {
+                    boxWidth: 15,
+                }
+            },
+
+
+        }
+    });
+</script>
+{% endblock %}

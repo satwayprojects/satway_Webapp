@@ -1,0 +1,221 @@
+{% extends 'dealer/base.html' %}
+{% block maincontent %}
+{% load static %}
+<style>
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 70%;
+    }
+
+    td,
+    th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #666363;
+    }
+
+    table tr,
+    td {
+        color: #ddddf0
+    }
+
+    .main_section {
+        width: 100%;
+        text-align: center;
+    }
+
+    .heading {
+        text-align: center;
+        color: #F8E444;
+    }
+
+    h2 {
+        font-weight: bold;
+        font-size: 20px;
+        margin-bottom: 30px;
+    }
+
+    .address {
+        padding: 10px 10px 10px 10px;
+        border-radius: 10px;
+        background-color: #151e2c;
+        width: 40%;
+        color: #ddddf0;
+    }
+
+    .declaration {
+        padding-left: 5px;
+        margin-top: 20px;
+        color: #ddddf0;
+    }
+
+
+    @media print {
+        body * {
+            visibility: hidden;
+            color: #0E1726;
+        }
+
+        .declaration {
+            color: #0E1726;
+        }
+
+        .address {
+            color: #0E1726;
+        }
+
+        #section-to-print,
+        #section-to-print * {
+            visibility: visible;
+        }
+
+
+    }
+</style>
+
+<div class="container-fluid mainContainer" id="mainContainer">
+    <div class="row">
+        <div class="col-sm-12 col-md-12  paddingClass"
+            style=" padding-left:30px ;padding-bottom: 20px;  background-color:#0E1726; border-color: #888EA8; border-style: solid;border-width: 1px 0 0 0;border-radius: 5px;box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);">
+            <div id="section-to-print">
+                <div class="main_section">
+                    <img height="100px" width="100px" src="{% static 'img/satwayimg.png' %}">
+                </div>
+                <div class="heading">
+                    <h2>CERTIFICATE OF INSTALLATION</h2>
+                </div>
+                <div class="address">
+                    {{dealer}}
+                </div>
+                <div class="declaration">
+                    <p>This is to certify that, this vehicle is equipped with the AIS 140 compliant device, approved by
+                        CDAC
+                        and ARAI</p>
+                </div>
+                <div class="declaration" style="margin-top: 30px; margin-bottom: 30px;">
+                    <p>Details of AIS 140 Device</p>
+                </div>
+                <div class="device_details">
+                    <table>
+                        <tr>
+                            <td>
+                                Device IMEI
+                            </td>
+                            <td>
+                                {{imei}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Model
+                            </td>
+                            <td>
+                                VYOM
+                            </td>
+                        <tr>
+                            <td style="width: 200px;">
+                                Manufacturer
+                            </td>
+                            <td style="width: 400px;">
+                                Satway Infosystems Pvt Ltd.
+                                16/324A, 1st floor, Thekkath Arcade Karukutty,
+                                Angamaly Ernakulam - 683 576.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                CDAC Certification Number
+                            </td>
+                            <td>
+                                CDAC-CR054
+                            </td>
+                        </tr>
+                        </tr>
+                    </table>
+                    <div class="declaration" style="margin-top: 30px; margin-bottom: 30px;">
+                        <p>Details of the vehicle</p>
+                    </div>
+                    <div class="vehicle_details">
+                        <table>
+                            <tr>
+                                <td style="width: 200px;">
+                                    Registration Number
+                                </td>
+                                <td style="width: 400px;">
+                                    For Registration
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Chassis Number
+                                </td>
+                                <td>
+                                    {{chassis}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Registered Owner Name
+                                </td>
+                                <td>
+                                    {{owner}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Registered Owner Address
+                                </td>
+                                <td>
+                                    {{address}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Engine Number
+                                </td>
+                                <td>
+                                    {{engine}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Date of Installation
+                                </td>
+                                <td>
+                                    {{installation_date}}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="declaration">
+                        <p>This letter has been issued on 2021-07-14 upon the specific request from the customer as a
+                            proof
+                            of Installation</p>
+                    </div>
+                    <div class="declaration">
+                        <p>Yours Sincerly,</p>
+                        {{dealer_name}}
+                    </div>
+                    <div class="declaration" style="margin-top: 100px;">
+                        <p>Authorised Signatory</p>
+                    </div>
+                </div>
+
+            </div>
+            <center><input type="button" class="submitbtn" value="Print" id="print"
+                    onclick="printDiv('section-to-print')"></center>
+        </div>
+    </div>
+</div>
+<script>
+    function printDiv(divName) {
+        window.print();
+    }
+
+</script>
+{% endblock %}

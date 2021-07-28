@@ -562,11 +562,15 @@ def reallocateDevice(request):
                 try:
                     live_location_table.objects.filter(imei_id = imei).delete()
                 except:
-                    print("Device not held  by user")
+                    pass
+                try:
+                    vehicleDetails.objects.filter(imei = imei).delete()
+                except:
+                    pass
             return JsonResponse({"status" : "Successfully Reallocated"})
         except:
             return JsonResponse({"status" :"Invalid Transaction"})
-
+        
     else:
         return render (request,'dealer/reallocation.html')
 
@@ -670,3 +674,25 @@ def ajax_load_subdealer(request):
     return JsonResponse({"imeiObject" :  list(userobject)})
 
 
+@login_required
+def certificate(request):
+    currentuser=request.user
+    currentusername = currentuser.username
+    if(currentuser.user_type != 'DI'):
+        # return 404
+        return render(request,'distributer/error404.html')
+    if request.method == 'GET':
+        return render(request,'distributer/genarate_certificate.html')
+    elif request.method == 'POST':
+        dealer_object = User.objects.get(username = currentusername)
+        
+        context = {"dealer_name":dealer_object.username,
+                    "dealer" : dealer_object.company_details,
+                    "imei" : request.POST.get('imei'),
+                    "chassis" : request.POST.get('chassis'),
+                    "owner" : request.POST.get('owner'),
+                    "address" : request.POST.get('address'),
+                    "engine" : request.POST.get('engine'),
+                    "installation_date" : request.POST.get('installation_date')}
+        print(context)
+        return render(request,'distributer/certificate.html',context)

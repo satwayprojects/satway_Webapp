@@ -101,6 +101,7 @@
                         <center><input type="submit" class="btn-success" style="width: 60%;" id="finalSubmit"
                                 value="Allocate"></center>
                         <h4 style="color: red;text-align: center;">{{status}}</h4>
+                        <center>  <span id="error_message" style="color:#f12043;"></span></center>
                     </div>
                 </div>
                 <div class=" col-sm-8 col-md-8">
@@ -166,7 +167,8 @@
             dataType: 'json',
             success: function (data) {
                 if (data.state == "F") {
-                    alert("IMEI not available in your database")
+                    document.getElementById("error_message").textContent = "IMEI not available in your database.";
+
                     // alert("array before splice" + imeilist)
                     const index = imeilist.indexOf(data.imei);
                     // alert("arrayIndex" + index)
@@ -176,6 +178,8 @@
                     // alert("array after splice" + imeilist)
                 }
                 else {
+                    document.getElementById("error_message").textContent = "";
+
                     var table = document.getElementById('imeiTable');
                     var rowsInTable = table.rows.length;
                     if (rowsInTable > 2) {

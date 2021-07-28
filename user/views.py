@@ -259,28 +259,28 @@ def allVehicles(request):
             
             
             vehicle_no.append(request.POST['vehicle_no'])
-            imeiList[0] = deviceobject.imei.imei
-            imei.append(deviceobject.imei.imei)
-            live_location_object = live_location_table.objects.get(imei_id = deviceobject.imei.imei)
-            latitude.append(float(live_location_object.latitude))
-            longitude.append(float(live_location_object.longitude))
-            timestamp.append(str(live_location_object.ctime))
-            speed.append(float(live_location_object.speed))
-            vehicle_mode.append(live_location_object.vehicle_mode)
-            locations = geolocator.reverse((float(live_location_object.latitude),float(live_location_object.longitude)))
-            if locations:
-                address.append(locations[0])
+            try:
+                imei.append(deviceobject.imei.imei)
+                live_location_object = live_location_table.objects.get(imei_id = deviceobject.imei.imei)
+                latitude.append(float(live_location_object.latitude))
+                longitude.append(float(live_location_object.longitude))
+                timestamp.append(str(live_location_object.ctime))
+                speed.append(float(live_location_object.speed))
+                vehicle_mode.append(live_location_object.vehicle_mode)
+                locations = geolocator.reverse((float(live_location_object.latitude),float(live_location_object.longitude)))
+                if locations:
+                    address.append(locations[0])
+                context = zip(vehicle_no, latitude,longitude,timestamp,speed,vehicle_mode,address,imei)
+                return render(request,'user/vehiclepage.html', {"context":context})
+            except:
+                return render(request,'user/vehiclepage.html')
                 
-            context = zip(vehicle_no, latitude,longitude,timestamp,speed,vehicle_mode,address,imei)
-            return render(request,'user/vehiclepage.html', {"context":context})
 
     except:
         deviceobject = vehicleDetails.objects.filter(username_id = username)
         i=0
         for rec in deviceobject:
-            vehicle_no.append(rec.vehicle_no)
-            imeiList[i] = rec.imei.imei
-            imei.append(rec.imei.imei)
+            
             try:
                 live_location_object = live_location_table.objects.get(imei_id = rec.imei.imei)
                 latitude.append(float(live_location_object.latitude))
@@ -291,7 +291,10 @@ def allVehicles(request):
                 locations = geolocator.reverse((float(live_location_object.latitude),float(live_location_object.longitude)))
                 if locations:
                     address.append(locations[0])
+                vehicle_no.append(rec.vehicle_no)
+                imei.append(rec.imei.imei)
                 i+=1
+
             except:
                 continue
     

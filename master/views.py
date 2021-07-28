@@ -301,7 +301,7 @@ def reallocateDevice(request):
                 transactionTable.objects.filter(imei = imei, held_by = currentUsername,last_transaction = True).delete()
                 transactionTable.objects.filter(imei = imei, sold_to = currentUsername,last_transaction = False).update(last_transaction = True)
                 deviceTable.objects.filter(imei= imei).update(current_owner=currentUsername)
-            return JsonResponse({"status" : "Successfully Deallocated"})
+            return JsonResponse({"status" : "Successfully Reallocated"})
         except:
             return JsonResponse({"status" :"Invalid Transaction"})
 

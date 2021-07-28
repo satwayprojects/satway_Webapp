@@ -49,5 +49,6 @@ urlpatterns = [
     path('inventory_dealer',views.inventory_dealer,name = "inventory_dealer"),
     path('inventory_deactive_stock',views.inventory_deactive_stock,name = "inventory_deactive_stock"),
     path('inventory_deactive_sold',views.inventory_deactive_sold,name = "inventory_deactive_sold"),
+    path('certificate',views.certificate,name = 'certificate'),
 
 ]

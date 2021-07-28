@@ -34,5 +34,5 @@ urlpatterns = [
     path('ajax_loaddealer_subdealer/',views.ajax_loaddealer_subdealer ,name='ajax_loaddealer_subdealer'),
     
     path('ajax_check_subuser_name',views.ajax_check_subuser_name, name='ajax_check_sub_username'),
-    path('cetificate',views.cetificate,name = 'cetificate'),
+    
 ]

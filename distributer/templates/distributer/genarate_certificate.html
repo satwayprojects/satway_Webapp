@@ -9,7 +9,7 @@
                     <h4 style="color: white; padding-top: 20px; padding-bottom: 20px;">Device Details</h1>
                 </center>
             </div>
-            <form method="POST" action="{% url 'index:cetificate'%}" id="certificate_form">{% csrf_token %}
+            <form method="POST" action="{% url 'distributer:certificate'%}" id="certificate_form">{% csrf_token %}
 
                 <label for="imei">IMEI<sup style="color: red;">*</sup></label>
                 <input type="text" id="imei" name="imei" autocomplete="off" required>

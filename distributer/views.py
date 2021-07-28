@@ -605,7 +605,11 @@ def reallocateDevice(request):
                 try:
                     live_location_table.objects.filter(imei_id = imei).delete()
                 except:
-                    print("Device not held  by user")
+                    pass
+                try:
+                    vehicleDetails.objects.filter(imei = imei).delete()
+                except:
+                    pass
             return JsonResponse({"status" : "Successfully Reallocated"})
         except:
             return JsonResponse({"status" :"Invalid Transaction"})
@@ -702,7 +706,7 @@ def ajax_load_dealer(request):
 
 
 @login_required
-def cetificate(request):
+def certificate(request):
     currentuser=request.user
     currentusername = currentuser.username
     if(currentuser.user_type != 'DI'):
@@ -723,3 +727,4 @@ def cetificate(request):
                     "installation_date" : request.POST.get('installation_date')}
         print(context)
         return render(request,'distributer/certificate.html',context)
+

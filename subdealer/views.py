@@ -217,7 +217,11 @@ def reallocateDevice(request):
                 try:
                     live_location_table.objects.filter(imei_id = imei).delete()
                 except:
-                    print("Device not held  by user")
+                    pass
+                try:
+                    vehicleDetails.objects.filter(imei = imei).delete()
+                except:
+                    pass
             return JsonResponse({"status" : "Successfully Reallocated"})
         except:
             return JsonResponse({"status" :"Invalid Transaction"})

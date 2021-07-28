@@ -198,26 +198,5 @@ def ajax_loaddealer_subdealer(request):
     return JsonResponse(listImei, safe=False)
 
 
-@login_required
 
-def cetificate(request):
-    currentuser=request.user
-    currentusername = currentuser.username
-    if(currentuser.user_type != 'DE'):
-        # return 404
-        return render(request,'dealer/error404.html')
-    if request.method == 'GET':
-        return render(request,'dealer/genarate_certificate.html')
-    elif request.method == 'POST':
-        dealer_object = User.objects.get(username = currentusername)
-        
-        context = {"dealer_name":dealer_object.username,
-                    "dealer" : dealer_object.company_details,
-                    "imei" : request.POST.get('imei'),
-                    "chassis" : request.POST.get('chassis'),
-                    "owner" : request.POST.get('owner'),
-                    "address" : request.POST.get('address'),
-                    "engine" : request.POST.get('engine'),
-                    "installation_date" : request.POST.get('installation_date')}
-        print(context)
-        return render(request,'dealer/certificate.html',context)
+

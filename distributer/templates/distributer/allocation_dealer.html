@@ -109,7 +109,7 @@
 
                         </center>
                         <h4 style="color: red;text-align: center;">{{status}}</h4>
-                      <center>  <span id="error_message" style="color:#f12043;"></span>
+                      <center>  <span id="error_message" style="color:#f12043;"></span></center>
                     </div>
                 </div>
 
@@ -196,7 +196,7 @@
                     document.getElementById("error_message").textContent = "";
                     var table = document.getElementById('imeiTable');
                     var rowsInTable = table.rows.length;
-                    if (rowsInTable > 2) {
+                    if (rowsInTable > 20) {
                         document.getElementById("submitIMEI").style.display = "block";
                         document.getElementById("mainContainer").style.opacity = "0.1";
                     }

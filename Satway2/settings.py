@@ -99,8 +99,14 @@ DATABASES = {
     }
 }
 
+#HTTPS SETTINGS
+# SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY = True
+# SECURE_SSL_REDIRECT = True
 
-
+#HSTS Settings
+# SECURE_HSTS_SECONDS = 3153600
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

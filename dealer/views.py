@@ -479,7 +479,8 @@ def deviceAllocationUser(request):
                                                         last_transaction = True)
                      
                     #print(transactionObj)
-                    vehicle_number = request.POST['vehicle_no'].replace(" ","")
+                    Temp_vehicle_number = request.POST['vehicle_no'].replace(" ","")
+                   
                     try: 
                         vehicleObject = vehicleDetails.objects.create(imei_id = imei,
                                                           username_id = userCustomer,
@@ -678,11 +679,11 @@ def ajax_load_subdealer(request):
 def certificate(request):
     currentuser=request.user
     currentusername = currentuser.username
-    if(currentuser.user_type != 'DI'):
+    if(currentuser.user_type != 'DE'):
         # return 404
-        return render(request,'distributer/error404.html')
+        return render(request,'dealer/error404.html')
     if request.method == 'GET':
-        return render(request,'distributer/genarate_certificate.html')
+        return render(request,'dealer/genarate_certificate.html')
     elif request.method == 'POST':
         dealer_object = User.objects.get(username = currentusername)
         
@@ -695,4 +696,4 @@ def certificate(request):
                     "engine" : request.POST.get('engine'),
                     "installation_date" : request.POST.get('installation_date')}
         print(context)
-        return render(request,'distributer/certificate.html',context)
+        return render(request,'dealer/certificate.html',context)

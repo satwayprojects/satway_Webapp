@@ -49,13 +49,31 @@ height:2px;
 .card_icon{
 padding-right:10px;
 }
-
+.day_list{
+    font-size: 30px;
+    font-weight: bold;
+}
 .card_box{
-   
     background-color:#0E1726;
     padding:5% 5% 2% 5%;
-  min-height: 200px;
+    min-height: 200px;
     width:100%;
+}
+.card_numbers{
+    min-width: 60px;
+    border-radius: 10px;
+    padding:10px 10px 10px 10px;
+    text-align: center;
+    background-color:#0E1726;
+    width:100%;
+}
+.card_numbers:hover{
+    background-color:#262e3a ;
+    width: 102%;
+}
+.card_top{
+    display: none;
+    padding-top: 10px;
 }
 .base-row{
 height:60px;

@@ -43,7 +43,6 @@ def dashboard(request):
     imeiList = []
   
     deviceobject = vehicleDetails.objects.filter(username_id = username)
-    print(deviceobject)
     try:
         for rec in deviceobject:
             vehicle_no.append(rec.vehicle_no)
@@ -53,12 +52,13 @@ def dashboard(request):
                 latitude.append(float(live_location_object.latitude))
                 longitude.append(float(live_location_object.longitude))
                 timestamp.append(str(live_location_object.ctime))
-                speed.append(float(live_location_object.latitude))
+                speed.append(float(live_location_object.speed))
                 vehicle_mode.append(live_location_object.vehicle_mode)
             except:
                 continue
-
-            print(vehicle_no)
+        print(speed)
+        print(latitude)
+        print(vehicle_no)
     except Exception as e:
         return render(request,'user/dashboard.html')    
 
@@ -71,13 +71,15 @@ def dashboard(request):
 def load_history(request):
     geolocator = GoogleV3(api_key="AIzaSyBuIUlchZeES76eY3eNz94jboBMlBEIZDE")
     if(request.POST.get('start_date') != None):
-
+        print(request.POST['imei'])
         vehicle_start_time =[]
         vehicle_start_point =[]
         vehicle_end_time =[]
         vehicle_end_point =[]
         total_distance=[]
         imei =request.POST['imei']
+        count = 0
+        print(imei)
         start_date = request.POST.get('start_date')
         start_time = request.POST.get('start_time')
 
@@ -101,28 +103,36 @@ def load_history(request):
                 locations = geolocator.reverse((end_object['latitude'],end_object['longitude']))
                 vehicle_end_point.append(locations)
                 start = end_object['ctime']
-                all_data = device_data_database.objects.filter(ctime__gte= start_object['ctime'], ctime__lte=end_object['ctime'], vehicle_mode='M').order_by('ctime')
 
-
+                
+                all_data = device_data_database.objects.filter(imei_id=imei,ctime__gte= start_object['ctime'], ctime__lte=end_object['ctime'], vehicle_mode='M').order_by('ctime')
 
                 lat = []
                 lon = []
-                N = 0
+                
                 for record in all_data:
                     lat.append(float(record.latitude))
                     lon.append(float(record.longitude))
-                    N += 1
-
+                    
+                N = len(lat)
                 dist = 0
                 total = 0
-                for i in range(1,N):
-                    if lat[i-1] != lat[i] and lon[i-1] != lon[i]:
-                        dist = abs(distance(lat[i-1],lon[i-1],lat[i],lon[i]))
-                        total +=  dist
-                total_distance.append(total)
+                for i in range(N-1):
+                    try:
+                        dist = abs(distance(lat[i],lon[i],lat[i+1],lon[i+1]))
+                    except:
+                        continue
+                    total +=  dist
+                total_distance.append(round(total,2))
+                count += 1
+                if count == 50:
+                    context = zip(vehicle_start_time,vehicle_start_point,vehicle_end_time,vehicle_end_point,total_distance)
+                    return render(request,'user/history.html',{"imei":imei,"context" : context})
 
+                # total_distance.append(0)
 
             except Exception as e:
+            
                 break 
         context = zip(vehicle_start_time,vehicle_start_point,vehicle_end_time,vehicle_end_point,total_distance)
         return render(request,'user/history.html',{"imei":imei,"context" : context})
@@ -136,8 +146,9 @@ def history_live_view(request):
     latitude =[]
     longitude =[]
     speed =[]
-    start_date= datetime.datetime.strptime(request.POST.get('startdate'),'%B %d, %Y, %I:%M %p')
-    end_date = datetime.datetime.strptime(request.POST.get('enddate'),'%B %d, %Y, %I:%M %p')
+    start_date= datetime.datetime.strptime(request.POST.get('startdate'),'%b %d, %Y, %I:%M %p')
+
+    end_date = datetime.datetime.strptime(request.POST.get('enddate'),'%b %d, %Y, %I:%M %p')
     imei = request.POST.get('imei')
     
     live_object = device_data_database.objects.filter(imei = imei,ctime__gt=start_date).order_by('ctime').values('latitude','longitude','speed') & device_data_database.objects.filter(imei = imei,ctime__lt=end_date).order_by('ctime').values('latitude','longitude','speed')

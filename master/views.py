@@ -86,6 +86,7 @@ def addDevice(request):
 
 @login_required
 def bulkadd(request):
+    import datetime
     currentUser = request.user
     username = currentUser.username
     if(currentUser.user_type != 'AD'):
@@ -112,6 +113,7 @@ def bulkadd(request):
         try:
             date_to_strp = time.strptime(row_data[7], '%Y-%m-%d %H:%M:%S')
             date_final = datetime.datetime.fromtimestamp(time.mktime(date_to_strp))
+            # date_final = datetime.datetime.strptime(row_data[7],'%Y-%m-%d')
             addDeviceObject = deviceTable(imei = row_data[0], 
                                     icc_id = row_data[1],
                                     unique_id = row_data[2],
@@ -127,6 +129,7 @@ def bulkadd(request):
             
         except Exception as e:
             status = {'status':e}
+            print(e)
             return render(request,'master/add_device.html',status)
     deviceTable.objects.bulk_create(objectarray)
 
